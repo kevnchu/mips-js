@@ -1,0 +1,23 @@
+{
+  "name": "spim",
+  "version": "1.0.0",
+  "description": "MIPS32 assembler and emulator",
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://kmczn@bitbucket.org/kmczn/spim.git"
+  },
+  "keywords": [
+    "MIPS"
+  ],
+  "author": "Kevin Chu",
+  "license": "MIT",
+  "homepage": "https://bitbucket.org/kmczn/spim#readme"
+}

@@ -1,31 +1,54 @@
-// token types
+//// TODO finalize token classes
 
-// label
-let matchLabel = (str) => {
-    return /^[A-z0-9]+\s*:\s*$/;
+const instructions = require('./instructions')
+
+// token classes
+const labelRe = /^[A-z0-9]+\s*:\s*$/;
+const directiveRe = /^\.[A-z]+/;
+const numericalConstantRe = /^(\d+|0x[0-9a-f]+)$/i;
+
+const isInstruction = (str) => {
+    return instructions.hasOwnProperty(str.toUpperCase());
 };
 
-// instruction
-let matchInstruction = (str) => {
-    str = str.trim();
-    let words = str.split(/\s+/);
+// trim whitespace, strip comments
+const sanitize = (str) => {
+    const commentIndex = str.indexOf('#');
+    if (commentIndex >= 0) {
+        str = str.substr(0, commentIndex);
+    }
+    return str.trim();
 };
 
-let sanitize = (str) => {
-    
-};
-
-let tokenize = function (program) {
-    let lines = program.split('\n');
-    let tokens = lines.map((text) => {
-        if (matchLabel(text)) {
-            return {
-                type: 'label',
-                value: text
+const tokenizer = function* (program) {
+    const lines = program.split('\n');
+    for (let text of lines) {
+        text = sanitize(text);
+        const words = text.split(/[,\s]+/);
+        console.log(words);
+        for (let word of words) {
+            let type;
+            if (labelRe.test(word)) {
+                type = 'label';
+            } else if (directiveRe.test(word)) {
+                type = 'directive';
+            } else if (isInstruction(word)) {
+                type = 'instruction';
+            } else if (numericalConstantRe.test(word)) {
+                type = 'number';
             }
+            if (!type) {
+                throw {
+                    name: 'Scanner error',
+                    message: 'Invalid token ' + word
+                };
+            }
+            yield {
+                value: word,
+                type
+            };
         }
-        
-    });
+    }
 };
 
-module.exports = { tokenize };
+module.exports = { tokenizer };
