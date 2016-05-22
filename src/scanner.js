@@ -1,8 +1,7 @@
-//// TODO finalize token classes
-
 const instructions = require('./instructions')
 
 // token classes
+//// TODO finalize token classes
 const labelRe = /^[A-z0-9]+\s*:\s*$/;
 const directiveRe = /^\.[A-z]+/;
 const numericalConstantRe = /^(\d+|0x[0-9a-f]+)$/i;
@@ -20,7 +19,7 @@ const sanitize = (str) => {
     return str.trim();
 };
 
-const tokenizer = function* (program) {
+const scan = function* (program) {
     const lines = program.split('\n');
     for (let text of lines) {
         text = sanitize(text);
@@ -51,4 +50,4 @@ const tokenizer = function* (program) {
     }
 };
 
-module.exports = { tokenizer };
+module.exports = { scan };

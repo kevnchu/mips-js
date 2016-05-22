@@ -1,5 +1,10 @@
-// instruction formats:
-let rFormat = function (opcode, rs, rt, rd, shamt, funct) {
+// Instruction types
+// Type format (bits 31 - 0)
+// R	opcode (6)	rs (5)	rt (5)	rd (5)	shamt (5)	funct (6)
+// I	opcode (6)	rs (5)	rt (5)	immediate (16)
+// J	opcode (6)	address (26)
+
+const rFormat = function (opcode, rs, rt, rd, shamt, funct) {
     return (opcode << 25) +
         (rs << 20) +
         (rt << 15) +
@@ -8,14 +13,14 @@ let rFormat = function (opcode, rs, rt, rd, shamt, funct) {
         funct;
 };
 
-let iFormat = function (opcode, rs, rt, immediate) {
+const iFormat = function (opcode, rs, rt, immediate) {
     return (opcode << 25) +
         (rs << 20) +
         (rt << 15) +
         immediate;
 };
 
-let jFormat = function (opcode, address) {
+const jFormat = function (opcode, address) {
     return (opcode << 25) + address;
 };
 
@@ -30,7 +35,7 @@ let jFormat = function (opcode, address) {
 // Random
 // SYSCALL, NOP, RFE, BREAK
 
-let instructions = {
+const instructions = {
     // Arithmetic
     'ADD': function (rd, rs, rt) {
         return rFormat(0, rs, rt ,rd, 0, 0x20);

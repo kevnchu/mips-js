@@ -1,28 +1,24 @@
 // converts MIPS instructions into machine instructions / data
-let fs = require('fs');
+const fs = require('fs');
+const scanner = require('./scanner');
+const parser = require('./parser');
+//const memory = require('./memory');
 
-
-let run = function (program) {
-    // scan
-    // let tokens = tokenize(lines);
-    // parse
+const run = function (program) {
+    tokenGen = scanner.scan(program);
+    parser.parse(tokenGen);
     
-    // start instruction cycle
-    // fetch instruction
-    // execute
 };
 
-fs.readFile('./examples/add.asm', 'utf8', (err, data) => {
-    if (err) {
-        // errback
-        console.log(err);
-        process.exit(-1);
-    }
-    run(data);
-});
+if (require.main === module) {
+    console.log('attempting');
+    fs.readFile('./examples/add.asm', 'utf8', (err, data) => {
+        if (err) {
+            // errback
+            console.log(err);
+            process.exit(-1);
+        }
+        run(data);
+    });
 
-// Instruction types
-// Type format (bits 31 - 0)
-// R	opcode (6)	rs (5)	rt (5)	rd (5)	shamt (5)	funct (6)
-// I	opcode (6)	rs (5)	rt (5)	immediate (16)
-// J	opcode (6)	address (26)
+}
