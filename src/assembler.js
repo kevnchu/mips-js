@@ -2,17 +2,18 @@
 const fs = require('fs');
 const scanner = require('./scanner');
 const parser = require('./parser');
-//const memory = require('./memory');
+const instructions = require('./instructions');
 
 const run = function (program) {
-    tokenGen = scanner.scan(program);
-    parser.parse(tokenGen);
-    
+    // let tokenGen = scanner.scan(program);
+    let lines = scanner.scan(program);
+    let definitions = {};
+    // parser.parse(tokenGen);
 };
 
 if (require.main === module) {
-    console.log('attempting');
     fs.readFile('./examples/add.asm', 'utf8', (err, data) => {
+    // fs.readFile('./examples/simple.asm', 'utf8', (err, data) => {
         if (err) {
             // errback
             console.log(err);

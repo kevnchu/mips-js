@@ -15,13 +15,36 @@ registerNames.forEach((name, index) => registerIndices[name] = index);
 
 class Cpu {
     constructor() {
+        // 32KB ram
+        this.ram = new Uint32Array(0x8000);
         this.registers = new Uint32Array(32);
+        // where does pc start?
+        this.pc = readMem(0xffffffff);
     }
     
-    step() {
-        // fetch instruction
-        
-        // 
+    readMem(address) {
+        return this.ram[address];
+    }
+    
+    writeMem(address, b) {
+        this.ram[address] = b;
+    }
+    
+    loop() {
+        let self = this;
+        return function* () {
+        while (true) {
+            // fetch instruction
+            const opcode = this.readMem(this.pc);
+            this.pc++;
+            switch (opcode) {
+                // TODO implement opcodes
+                case 0x0000:
+                default:
+                    // update hook 
+                    break;
+            }
+        }
         
     }
 }

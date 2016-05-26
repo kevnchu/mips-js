@@ -1,11 +1,5 @@
 const instructions = require('./instructions')
 
-// token classes
-//// TODO finalize token classes
-const labelRe = /^[A-z0-9]+\s*:\s*$/;
-const directiveRe = /^\.[A-z]+/;
-const numericalConstantRe = /^(\d+|0x[0-9a-f]+)$/i;
-
 const isInstruction = (str) => {
     return instructions.hasOwnProperty(str.toUpperCase());
 };
@@ -19,22 +13,57 @@ const sanitize = (str) => {
     return str.trim();
 };
 
+const preprocess = function (lines) {
+    const dataRe = /^\.data$/;
+    const textRe = /^\.text$/;
+    const dataIndex = lines.findIndex((x) => dataRe.test(x));
+    const textIndex = lines.findIndex((x) => textRe.test(x));
+    const cutIndex = Math.max(dataIndex, textIndex);
+    const first = lines.slice(0, cutIndex);
+    const second = lines.slice(cutIndex);
+    return {
+        //data: dataIndex === cutIndex ? second : first,
+        //text: dataIndex === cutIndex ? first : second
+        data: dataIndex,
+        text: textIndex
+    };
+};
+
 const scan = function* (program) {
-    const lines = program.split('\n');
+    // token classes
+    const label = /^[A-z_][A-z0-9]*\s*:\s*$/;
+    const directive = /^\.[A-z]+/;
+    const numericalConstant = /^(\d+|0x[0-9a-f]+)$/i;
+    const register = /^\$/;
+    const identifier = /^[0-9A-z]+$/;
+    const address = /[0-9]*\([\$0-9A-z]+\)$/;
+
+    let lines = program.split('\n').map((str) =>
+                                          sanitize(str));
+    lines = preprocess(lines);
+    // TODO split up scanning by data and instructions
+    return;
     for (let text of lines) {
-        text = sanitize(text);
+	if (!text) {
+	    continue;
+	}
         const words = text.split(/[,\s]+/);
-        console.log(words);
         for (let word of words) {
             let type;
-            if (labelRe.test(word)) {
+            if (label.test(word)) {
                 type = 'label';
-            } else if (directiveRe.test(word)) {
+            } else if (directive.test(word)) {
                 type = 'directive';
             } else if (isInstruction(word)) {
                 type = 'instruction';
-            } else if (numericalConstantRe.test(word)) {
+            } else if (numericalConstant.test(word)) {
                 type = 'number';
+            } else if (register.test(word)) {
+		type = 'register';
+	    } else if (identifier.test(word)) {
+                type = 'identifier';
+            } else if (address.test(word)) {
+                type = 'address';
             }
             if (!type) {
                 throw {
