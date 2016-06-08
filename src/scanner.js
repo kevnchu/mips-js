@@ -10,7 +10,8 @@
 // Numbers are base 10 by default.  0x prefix indicates hexadecimal.
 // Strings are enclosed in quotes.  May include \n=newline or \t=tab.  Used for prompts.
 
-const instructions = require('./instructions')
+const instructions = require('./instructions');
+const Token = require('./token');
 
 const isInstruction = (str) => {
     return instructions.hasOwnProperty(str.toUpperCase());
@@ -18,19 +19,18 @@ const isInstruction = (str) => {
 
 const charIter = (str) => {
     let index = 0;
-    const generator = function* () { 
+    const generator = function* () {
         for (let c of str) {
             ++index;
             yield c;
         }
     };
-    
+
     charGenerator = generator(str);
-    
+
     return {
         getChar: () => charGenerator.next().value,
-        peek: () => str[index],
-        currentChar: () =>  str[index - 1]
+        peek: () => str[index]
     };
 };
 
@@ -49,66 +49,125 @@ const numeric = /[0-9]/;
 const alphaNumeric = /[A-z0-9]/;
 const whitespace = /\s/;
 
-// generator function returns an iterable that yields tokens
-const scan = function* (program) {
-    const {currentChar, getChar, peek} = charIter(program);
-    let curr = getChar();
-    const scanWhile = (regex) => {
+class Tokenizer {
+    constructor(program) {
+        const {getChar, peek} = charIter(program);
+        this.getChar = getChar;
+        this.peek = peek;
+    }
+
+    scanWhile(regex) {
+        let curr = this.curr;
         let lexeme = '';
         do {
             lexeme += curr;
-            curr = getChar();
+            curr = this.getChar();
         } while (regex.test(curr));
+        this.curr = curr;
         return lexeme;
-    };
-    
-    while (curr) {
-        if (whitespace.test(curr)) {
-            curr = getChar();
-            continue;
-        }
-        let type;
-        let lexeme = '';
-        if (alpha.test(curr)) {
-            type = 'identifier';
-            lexeme = scanWhile(alphaNumeric);
-            if (isInstruction(lexeme)) {
-                type = 'instruction';
-            }
-        } else if (numeric.test(curr)) {
-            type = 'int';
-            lexeme = scanWhile(numeric);
-            lexeme = parseInt(lexeme);
-        } else if (curr === '.') {
-            type = 'directive';
-            lexeme = scanWhile(alphaNumeric);
-        } else if (curr === '$') {
-            type = 'register';
-            lexeme = scanWhile(alphaNumeric);
-        } else if (curr === '"') {
-            type = 'string';
-            do {
-                lexeme += curr;
-                curr = getChar();
-            } while (curr && curr !== '"');
-            lexeme += curr;
-            curr = getChar();
-        } else if (curr === '#') {
-            // ignore comment
-            while (curr && curr !== '\n') {
-                curr = getChar();
-            }
-            continue;
-        } else {
-            type = 'ascii';
-            lexeme = curr;
-            curr = getChar();
-        }
-        yield {
-            value: lexeme,
-            type: type
-        }
     }
+
+    getEolToken() {
+        const token = new Token('eol', this.curr);
+        this.curr = this.getChar();
+        return token;
+    }
+
+    getIntToken() {
+        const type = 'int';
+        let value = this.scanWhile(numeric);
+        value = parseInt(value);
+        return new Token(type, value);
+    }
+
+    getStringToken() {
+        const type = 'string';
+        let value = '';
+        let curr = this.curr;
+        do {
+            value += curr;
+            curr = this.getChar();
+        } while (curr && curr !== '"');
+        value += curr;
+        this.curr = this.getChar();
+        return new Token(type, value);
+    }
+
+    getIdentifierToken() {
+        let type = 'identifier';
+        const value = this.scanWhile(alphaNumeric);
+        if (isInstruction(value)) {
+            type = 'instruction';
+        }
+        return new Token(type, value);
+    }
+
+    getDirectiveToken() {
+        const type = 'directive';
+        let value = this.scanWhile(alphaNumeric);
+        return new Token(type, value);
+    }
+
+    getRegisterToken() {
+        const type = 'register';
+        let value = this.scanWhile(alphaNumeric);
+        return new Token(type, value);
+    }
+
+    skipComment() {
+        let curr = this.curr;
+        while (curr && curr !== '\n') {
+            curr = this.getChar();
+        }
+        this.curr = curr;
+    }
+
+    getCharToken() {
+        const type = 'ascii';
+        const value = this.curr;
+        this.curr = this.getChar();
+        return new Token(type, value);
+    }
+
+    tokenize() {
+        const self = this;
+        return (function* () {
+            self.curr = self.getChar();
+            while (self.curr) {
+                let curr = self.curr;
+                let token;
+                if (curr === '\n') {
+                    token = self.getEolToken();
+                } else if (whitespace.test(curr)) {
+                    // ignore whitespace
+                    self.scanWhile(whitespace);
+                    continue;
+                } else if (alpha.test(curr)) {
+                    token = self.getIdentifierToken();
+                } else if (numeric.test(curr)) {
+                    token = self.getIntToken();
+                } else if (curr === '.') {
+                    token = self.getDirectiveToken();
+                } else if (curr === '$') {
+                    token = self.getRegisterToken();
+                } else if (curr === '"') {
+                    token = self.getStringToken();
+                } else if (curr === '#') {
+                    // ignore comment
+                    self.skipComment();
+                    continue;
+                } else {
+                    token = self.getCharToken();
+                }
+                yield token;
+            }
+        }());
+    }
+}
+
+// generator function returns an iterable that yields tokens
+const scan = (program) => {
+    return new Tokenizer(program).tokenize();
 };
 
 module.exports = { scan, charIter };
