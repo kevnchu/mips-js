@@ -19,5 +19,8 @@
   ],
   "author": "Kevin Chu",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/kmczn/spim#readme"
+  "homepage": "https://bitbucket.org/kmczn/spim#readme",
+  "devDependencies": {
+    "chai": "^3.5.0"
+  }
 }

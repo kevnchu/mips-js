@@ -1,27 +1,41 @@
+// constants
+const opcodeShift = 26;
+const rsShift =  21;
+const rtShift = 16;
+const rdShift = 11;
+const saShift = 6;
+const funcShift = 0;
+
+const opcodeBits = 6;
+const rsBits = 5;
+const rtBits = 5;
+const rdBits = 5;
+const saBits = 5;
+const funcBits = 6;
+
 // Instruction types
 // Type format (bits 31 - 0)
 // R	opcode (6)	rs (5)	rt (5)	rd (5)	shamt (5)	funct (6)
 // I	opcode (6)	rs (5)	rt (5)	immediate (16)
 // J	opcode (6)	address (26)
-
-const rFormat = function (opcode, rs, rt, rd, shamt, funct) {
-    return (opcode << 25) +
-        (rs << 20) +
-        (rt << 15) +
-        (rd << 10) +
-        (shamt << 5) +
+const rEncode = function (opcode, rs, rt, rd, shamt, funct) {
+    return (opcode << opcodeShift) +
+        (rs << rsShift) +
+        (rt << rtShift) +
+        (rd << rdShift) +
+        (shamt << saShift) +
         funct;
 };
 
-const iFormat = function (opcode, rs, rt, immediate) {
-    return (opcode << 25) +
-        (rs << 20) +
-        (rt << 15) +
+const iEncode = function (opcode, rs, rt, immediate) {
+    return (opcode << opcodeShift) +
+        (rs << rsShift) +
+        (rt << rtShift) +
         immediate;
 };
 
-const jFormat = function (opcode, address) {
-    return (opcode << 25) + address;
+const jEncode = function (opcode, address) {
+    return (opcode << opcodeShift) + address;
 };
 
 // Arithmetic
@@ -38,84 +52,84 @@ const jFormat = function (opcode, address) {
 const instructions = {
     // Arithmetic
     'ADD': function (rd, rs, rt) {
-        return rFormat(0, rs, rt ,rd, 0, 0x20);
+        return rEncode(0, rs, rt ,rd, 0, 0x20);
     },
     'ADDI': function (rt, rs, data) {
-        return iFormat(0x8, rs, rt, data);
+        return iEncode(0x8, rs, rt, data);
     },
     'SUB': function (rd, rs, rt) {
-        return rFormat(0, rs, rt, rd, 0, 0x22);
+        return rEncode(0, rs, rt, rd, 0, 0x22);
     },
     'MULT': function (rs, rt) {
-        return rFormat(0, rs, rt, rd, 0, 0x18);
+        return rEncode(0, rs, rt, rd, 0, 0x18);
     },
     'DIV': function (rs, rt) {
-        return rFormat(0, rs, rt, rd, 0, 0x1a);        
+        return rEncode(0, rs, rt, rd, 0, 0x1a);        
     },
     
     // Logical
     'SLT': function (rd, rs, rt) {
-        return rFormat(0, rs, rt, rd, 0, 0x2a);
+        return rEncode(0, rs, rt, rd, 0, 0x2a);
     },
     'SLTI': function (rt, rs, data) {
-        return iFormat(0xa, rs, rt, data);
+        return iEncode(0xa, rs, rt, data);
     },
     'AND': function (rd, rs, rt) {
-        return rFormat(0, rs, rt, rd, 0, 0x24);
+        return rEncode(0, rs, rt, rd, 0, 0x24);
     },
     'ANDI': function (rt, rs, data) {
-        return iFormat(0xc, rs, rt, data);
+        return iEncode(0xc, rs, rt, data);
     },
     'OR': function (rd, rs, rt) {
-        return rFormat(0, rs, rt, rd, 0, 0x25);
+        return rEncode(0, rs, rt, rd, 0, 0x25);
     },
     'ORI': function (rt, rs, data) {
-        return iFormat(0xd, rs, rt, data);
+        return iEncode(0xd, rs, rt, data);
     },
     'NOR': function (rd, rs, rt) {
-        return rFormat(0, rs, rt, rd, 0, 0x27);
+        return rEncode(0, rs, rt, rd, 0, 0x27);
     },
     'XOR': function (rd, rs, rt) {
-        return rFormat(0, rs, rt, rd, 0, 0x26);
+        return rEncode(0, rs, rt, rd, 0, 0x26);
     },
     
     // Bitwise shift
     'SLL': function (rd, rt, shamt) {
-        return rFormat(0, 0, rt, rd, shamt, 0);
+        return rEncode(0, 0, rt, rd, shamt, 0);
     },
     'SRL': function (rd, rt, shamt) {
-        return rFormat(0, 0, rt, rd, shamt, 0x2);
+        return rEncode(0, 0, rt, rd, shamt, 0x2);
     },
     'SLLV': function (rd, rt, rs) {
-        return rFormat(0, rs, rt, rd, 0, 0x4);
+        return rEncode(0, rs, rt, rd, 0, 0x4);
     },
     'SRLV': function (rd, rt, rs) {
-        return rFormat(0, rs, rt, rd, 0, 0x6);
+        return rEncode(0, rs, rt, rd, 0, 0x6);
     },
     'SRA': function (rd, rt, shamt) {
-        return rFormat(0, 0, rt, rd, shamt, 0x3);
+        return rEncode(0, 0, rt, rd, shamt, 0x3);
     },
     'SRAV': function (rd, rt, rs) {
-        return rFormat(0, rs, rt, rd, 0, 0x7);
+        return rEncode(0, rs, rt, rd, 0, 0x7);
     },
     
     
     // memory
     // load byte: lb $rt,C($rs)
     'LB': function (rt, c, rs) {
-        return iFormat(0x20, rs, rt, c);
+        return iEncode(0x20, rs, rt, c);
     },
     // store byte: sb $t,C($s)
     'SB': function (rt, c, rs) {
-        return iFormat(0x28, rs, rt, c);
+        return iEncode(0x28, rs, rt, c);
     },
     // load word: lw $t,C($s)
     'LW': function (rt, c, rs) {
-        return iFormat(0x23, rs, rt, c);
+        return iEncode(0x23, rs, rt, c);
     },
     // store word: sw $t,C($s)
     'SW': function (rt, c, rs) {
-        return iFormat(0x2b, rs, rt, c);
+        return iEncode(0x2b, rs, rt, c);
     },
     'LI': function () {
         // TODO pseudo instruction
@@ -123,22 +137,30 @@ const instructions = {
     
     // conditional
     'BEQ': function (rs, rt, c) {
-        return iFormat(0x4, rs, rt, c);
+        return iEncode(0x4, rs, rt, c);
     },
     'BNE': function (rs, rt, c) {
-        return iFormat(0x5, rs, rt, c);
+        return iEncode(0x5, rs, rt, c);
     },
     
     // unconditional jump
     'J': function (c) {
-        return jFormat(0x2, c);
+        return jEncode(0x2, c);
     },
     'JR': function (rs) {
-        return rFormat(0, rs, 0, 0, 0, 0x8);
+        return rEncode(0, rs, 0, 0, 0, 0x8);
     },
     'JAL': function (c) {
-        return jFormat(0x3, c)
+        return jEncode(0x3, c)
+    },
+
+    'SYSCALL': function () {
+        // 
     }
 };
+
+if (require.main === module) {
+    
+}
 
 module.exports = instructions;

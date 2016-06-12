@@ -1,5 +1,9 @@
 // MIPS 32 CPU
 
+const textAddress = 0x400000;
+const dataAddress =  0x10010000;
+
+
 const registerNames = [
     '$zero', '$at', '$v0', '$v1',
     '$a0', '$a1', '$a2', '$a3',
@@ -19,7 +23,8 @@ class Cpu {
         this.ram = new Uint32Array(0x8000);
         this.registers = new Uint32Array(32);
         // where does pc start?
-        this.pc = readMem(0xffffffff);
+        // this.pc = 0x400000;
+        this.pc = textAddress;
     }
     
     readMem(address) {
@@ -31,20 +36,34 @@ class Cpu {
     }
     
     loop() {
-        let self = this;
-        return function* () {
         while (true) {
             // fetch instruction
-            const opcode = this.readMem(this.pc);
-            this.pc++;
+            const instruction = this.readMem(this.pc);
+            const opcode = instruction >> 25;
             switch (opcode) {
-                // TODO implement opcodes
-                case 0x0000:
-                default:
-                    // update hook 
-                    break;
+                case 0:
+                    const funct = instruction & 0x3f;
+                    switch (funct) {
+                        case 0x20:
+                            // add
+                            break;
+                    }
+                case 0x8:
+
+                case 0xa:
+
+                case 0xc:
+                case 0xd:
+
+                case 0x20:
+                case 0x28:
+                case 0x23:
+                case 0x2b:
+                case 0x4:
+                case 0x5:
+                case 0x2:
+                case 0x3:
             }
         }
-        
     }
 }

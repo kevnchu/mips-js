@@ -12,26 +12,10 @@
 
 const instructions = require('./instructions');
 const Token = require('./token');
+const util = require('./util');
 
 const isInstruction = (str) => {
     return instructions.hasOwnProperty(str.toUpperCase());
-};
-
-const charIter = (str) => {
-    let index = 0;
-    const generator = function* () {
-        for (let c of str) {
-            ++index;
-            yield c;
-        }
-    };
-
-    charGenerator = generator(str);
-
-    return {
-        getChar: () => charGenerator.next().value,
-        peek: () => str[index]
-    };
 };
 
 // token classes
@@ -45,15 +29,14 @@ const charIter = (str) => {
 
 // regexps
 const alpha = /[A-z]/;
-const numeric = /[0-9]/;
+const numeric = /[-0-9]/;
 const alphaNumeric = /[A-z0-9]/;
 const whitespace = /\s/;
 
 class Tokenizer {
     constructor(program) {
-        const {getChar, peek} = charIter(program);
-        this.getChar = getChar;
-        this.peek = peek;
+        const {getNext} = util.generatorAdapter(program);
+        this.getChar = getNext;
     }
 
     scanWhile(regex) {
@@ -62,7 +45,7 @@ class Tokenizer {
         do {
             lexeme += curr;
             curr = this.getChar();
-        } while (regex.test(curr));
+        } while (curr && regex.test(curr));
         this.curr = curr;
         return lexeme;
     }
@@ -170,4 +153,4 @@ const scan = (program) => {
     return new Tokenizer(program).tokenize();
 };
 
-module.exports = { scan, charIter };
+module.exports = { scan };
