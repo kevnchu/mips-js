@@ -28,6 +28,8 @@ class Parser {
             const type = token.type;
             switch (type) {
                 case 'directive':
+                    // top level directives: data, text, global
+                    // otherwise, it's a data definition
                     if (value === '.data') {
                         this.segment = 'data';
                         segment = program.data;
@@ -42,11 +44,9 @@ class Parser {
                     segment.push(this.parseInstruction());
                     break;
                 case 'identifier':
-                    // label
                     segment.push(this.parseLabel());
                     break;
                 case 'eol':
-                    break;
                 default:
                     break;
             }
@@ -55,6 +55,13 @@ class Parser {
     }
 
     parseDirective() {
+        // .directive [args]
+        const directive = this.currentToken;
+        let token = this.getToken();
+        while (token && token.type !== 'eol') {
+            token = this.getToken();
+        }
+        return directive;
     }
 
     parseInstruction() {
@@ -81,9 +88,9 @@ class Parser {
         }
         // squish arguments
         args = args.map((tokens) => {
-            // assumption, argument made of multiple tokens is a register
             if (tokens.length > 1) {
                 let value = tokens.map((token) => token.value);
+                // XXX assumption, argument made of multiple tokens is a register
                 return new Token('register', value);
             }
             return tokens[0];
@@ -120,13 +127,47 @@ class Parser {
         //      jal  anotherroutine
         // ...
         // return { value: <label name>, }
-        const token = this.currentToken;
-        this.currentToken = this.getToken();
-        return token;
+        if (this.segment === 'data') {
+            // declaration
+            return this.parseDataDeclaration();
+        }
+        const label = this.currentToken;
+        let token = this.getToken();
+        if (!token || token.value !== ':') {
+            throw {
+                name: 'Parse error',
+                message: 'Expected a semicolon after label.'
+            }
+        }
+        label.type = 'label';
+        return label;
     }
 
-    parseIdentifier() {
-
+    parseDataDeclaration() {
+        let token = this.currentToken;
+        const labelName = token.value;
+        token = this.getToken(); // semicolon
+        token = this.getToken(); // directive
+        if (!token || !token.type === 'directive') {
+            throw {
+                name: 'Parse error',
+                message: 'Expected a data directive'
+            };
+        }
+        const dataType = token.value;
+        const data = [];
+        token = this.getToken();
+        while (token && token.type !== 'eol') {
+            if (token.value !== ',') {
+                data.push(token);
+            }
+            token = this.getToken();
+        }
+        return {
+            value: labelName,
+            type: dataType,
+            data: data
+        };
     }
 }
 
