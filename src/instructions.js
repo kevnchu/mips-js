@@ -19,23 +19,23 @@ const saShift = 6
 // I	opcode (6)	rs (5)	rt (5)	immediate (16)
 // J	opcode (6)	address (26)
 const rEncode = function (opcode, rs, rt, rd, shamt, funct) {
-  return (opcode << opcodeShift) +
+  return ((opcode << opcodeShift) +
     (rs << rsShift) +
     (rt << rtShift) +
     (rd << rdShift) +
     (shamt << saShift) +
-    funct
+    funct) >>> 0
 }
 
 const iEncode = function (opcode, rs, rt, immediate) {
-  return (opcode << opcodeShift) +
+  return ((opcode << opcodeShift) +
     (rs << rsShift) +
     (rt << rtShift) +
-    immediate
+    immediate) >>> 0
 }
 
 const jEncode = function (opcode, address) {
-  return (opcode << opcodeShift) + address
+  return ((opcode << opcodeShift) + address) >>> 0
 }
 
 // Arithmetic

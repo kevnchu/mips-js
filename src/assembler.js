@@ -2,7 +2,7 @@
 const fs = require('fs')
 const parser = require('./parser')
 const instructions = require('./instructions')
-const { registersIndices } = require('./registers')
+const { registerIndices } = require('./registers')
 
 // const textSp = 0x00400000
 // const dataSp = 0x10010000
@@ -14,10 +14,7 @@ const translateArgs = (args) => {
   return args.map((arg) => {
     if (arg.type === 'register') {
       // resolve register / memory addressing
-      let reg = registersIndices[arg.value]
-      if (reg) {
-        return reg
-      }
+      return registerIndices[arg.value]
     }
     return arg.value
   })
@@ -26,14 +23,11 @@ const translateArgs = (args) => {
 const translateInstruction = (instruction) => {
   const args = translateArgs(instruction.args)
   const mneumonic = instruction.value.toUpperCase()
-  console.log(instructions[mneumonic].apply(null, args))
+  return instructions[mneumonic].apply(null, args).toString(2)
 }
 
 const run = function (program) {
-  const { text, data } = parser.parse(program)
-  for (let line of data) {
-    console.log(line)
-  }
+  const { text } = parser.parse(program)
   let instructionTable = {
     _default: []
   }

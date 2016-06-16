@@ -6,14 +6,21 @@
 
 const scan = require('./scanner').scan
 const util = require('./util')
-const Token = require('./token')
+
+class ParseError extends Error {
+  constructor (message) {
+    super()
+    this.name = 'Parse error'
+    this.message = message
+  }
+}
 
 class Parser {
 
   constructor (input) {
     this.tokenGenerator = scan(input)
     this.getToken = util.generatorAdapter(this.tokenGenerator).getNext
-    this.segment = 'data'
+    this.segment = 'text'
   }
 
   parse () {
@@ -21,7 +28,7 @@ class Parser {
       data: [],
       text: []
     }
-    let segment = program.data
+    let segment = program[this.segment]
     for (let token of this.tokenGenerator) {
       this.currentToken = token
       const value = token.value
@@ -47,13 +54,15 @@ class Parser {
           segment.push(this.parseLabel())
           break
         case 'eol':
-        default:
           break
+        default:
+          throw new ParseError('Expected directive, instruction, or label')
       }
     }
     return program
   }
 
+  // TODO
   parseDirective () {
     // .directive [args]
     const directive = this.currentToken
@@ -66,53 +75,20 @@ class Parser {
 
   parseInstruction () {
     const instruction = this.currentToken
-    let args = [[]]
+    let args = []
 
     // parse args
     let token = this.getToken()
-    let argument = args[0]
-    while (1) {
-      if (!token || token.type === 'eol') {
-        break
-      }
-      // each argument is made of one or more tokens.
-      // collect tokens for each argument.
-      if (token.value === ',' && argument.length) {
-        // push arg
-        argument = []
-        args.push(argument)
-      } else {
-        argument.push(token)
+    while (token && token.type !== 'eol') {
+      // ignoring , and ()
+      if (token.type !== 'ascii') {
+        args.push(token)
       }
       token = this.getToken()
     }
-    // squish arguments
-    args = args.map((tokens) => {
-      if (tokens.length > 1) {
-        let value = tokens.map((token) => token.value)
-        // XXX assumption, argument made of multiple tokens is a register
-        return new Token('register', value)
-      }
-      return tokens[0]
-    })
 
     instruction.args = args
     return instruction
-  }
-
-  // TODO
-  parseArguments (arg) {
-    if (!arg[0]) {
-      return
-    }
-    if (arg.length === 1) {
-      return arg[0]
-    }
-    const value = arg.map((token) => {
-      return token.value
-    }).join('')
-    let type = arg.find((token) => token.type === 'register')
-    return new Token(type || arg[0].type, value)
   }
 
   parseLabel () {
@@ -135,10 +111,7 @@ class Parser {
     const label = this.currentToken
     let token = this.getToken()
     if (!token || token.value !== ':') {
-      throw { // eslint-disable-line no-throw-literal
-        name: 'Parse error',
-        message: 'Expected a semicolon after label.'
-      }
+      throw new ParseError('Expected a semicolon after label.')
     }
     label.type = 'label'
     return label
@@ -150,10 +123,7 @@ class Parser {
     token = this.getToken() // semicolon
     token = this.getToken() // directive
     if (!token || !token.type === 'directive') {
-      throw { // eslint-disable-line no-throw-literal
-        name: 'Parse error',
-        message: 'Expected a data directive'
-      }
+      throw new ParseError('Expected a data directive')
     }
     const dataType = token.value
     const data = []

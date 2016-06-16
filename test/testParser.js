@@ -8,13 +8,14 @@ describe('parser.js', () => {
       let { text } = parser.parse(str)
       let args = text[0].args
       assert.equal(text[0].value, 'addi')
-      assert.equal(args.length, 3)
+      assert.equal(args.length, 4)
 
       str = '.text\nj foo'
       text = parser.parse(str).text
       args = text[0].args
       assert.equal(text[0].value, 'j')
       assert.equal(args.length, 1)
+      assert.equal(args[0].value, 'foo')
     })
 
     it('separates data and text segments', () => {
