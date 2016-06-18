@@ -136,9 +136,9 @@ const instructions = {
   'SW': function (rt, c, rs) {
     return iEncode(0x2b, rs, rt, c)
   },
-  'LI': function () {
-    // TODO pseudo instruction
-    return 0
+  'LI': function (rt, c) {
+    // # ori   $t0, $zero, 50
+    return instructions.ORI(rt, 0, c)
   },
 
   // conditional
@@ -162,7 +162,7 @@ const instructions = {
 
   // TODO
   'SYSCALL': function () {
-    return 0
+    return 12
   }
 }
 
