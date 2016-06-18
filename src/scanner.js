@@ -30,8 +30,17 @@ const isInstruction = (str) => {
 // regexps
 const alpha = /[A-z]/
 const numeric = /[-0-9]/
+const hexNumeric = /[-xX0-9A-Fa-f]/
 const alphaNumeric = /[A-z0-9]/
 const whitespace = /\s/
+
+class SyntaxError extends Error {
+  constructor (message) {
+    super()
+    this.name = 'Syntax error'
+    this.message = message
+  }
+}
 
 class Tokenizer {
   constructor (program) {
@@ -58,8 +67,12 @@ class Tokenizer {
 
   getIntToken () {
     const type = 'int'
-    let value = this.scanWhile(numeric)
-    value = parseInt(value)
+    let value = this.scanWhile(hexNumeric)
+    try {
+      value = parseInt(value)
+    } catch (e) {
+      throw new SyntaxError('Illegal token')
+    }
     return new Token(type, value)
   }
 

@@ -46,6 +46,13 @@ describe('parser.js', () => {
       assert.equal(data[0].value, 'msg')
       assert.equal(data[0].type, '.asciiz')
       assert.equal(data[0].data[0].value, '"test message"')
+
+      str = '.data value: .word 15'
+      data = parser.parse(str).data
+      assert.equal(data[0].type, '.word')
+      assert.equal(data[0].data[0].value, 15)
+
+      // TODO test data sequence
     })
 
     it('parses text label', () => {
@@ -57,6 +64,14 @@ describe('parser.js', () => {
 
     it('parses instruction arguments', () => {
       // TODO
+    })
+
+    it('parses hex arguments', () => {
+      let str = 'li $t2 0x19'
+      let { text } = parser.parse(str)
+      let args = text[0].args
+      assert.equal(args.length, 2)
+      assert.equal(args[1].value, 25)
     })
   })
 })

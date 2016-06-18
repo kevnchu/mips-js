@@ -11,6 +11,14 @@ describe('scanner.js', () => {
       assert.equal(token.type, 'int')
     })
 
+    it('tokenizes hex values', () => {
+      const str = '0xfa'
+      const tokenGen = scanner.scan(str)
+      const token = tokenGen.next().value
+      assert.equal(token.value, 250)
+      assert.equal(token.type, 'int')
+    })
+
     it('should tokenize negative ints', () => {
       const str = '-123'
       const tokenGen = scanner.scan(str)
