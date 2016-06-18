@@ -138,6 +138,7 @@ const instructions = {
   },
   'LI': function () {
     // TODO pseudo instruction
+    return 0
   },
 
   // conditional
@@ -159,7 +160,9 @@ const instructions = {
     return jEncode(0x3, c)
   },
 
+  // TODO
   'SYSCALL': function () {
+    return 0
   }
 }
 

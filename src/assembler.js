@@ -7,47 +7,70 @@ const { registerIndices } = require('./registers')
 // const textSp = 0x00400000
 // const dataSp = 0x10010000
 
-const translateArgs = (args) => {
-  if (!args) {
-    return args
-  }
-  return args.map((arg) => {
-    if (arg.type === 'register') {
-      // resolve register / memory addressing
-      return registerIndices[arg.value]
+class Assembler {
+  constructor(program) {
+    const { text, data } = parser.parse(program)
+    this.instructionTable = {
+      _default: []
     }
-    return arg.value
-  })
-}
-
-const translateInstruction = (instruction) => {
-  const args = translateArgs(instruction.args)
-  const mneumonic = instruction.value.toUpperCase()
-  return instructions[mneumonic].apply(null, args).toString(2)
-}
-
-const run = function (program) {
-  const { text } = parser.parse(program)
-  let instructionTable = {
-    _default: []
-  }
-  let instructions = instructionTable._default
-  for (let line of text) {
-    if (line.type === 'label') {
-      instructions = instructionTable[line.value] = []
-    } else {
-      instructions.push(translateInstruction(line))
+    this.symbolTable = {}
+    let instructionSegment = this.instructionTable._default
+    // load data segment first
+    for (let line of data) {
+      this.symbolTable[line.value] = this.loadData(line)
     }
+    for (let line of text) {
+      if (line.type === 'label') {
+        instructionSegment = this.instructionTable[line.value] = []
+      } else {
+        instructionSegment.push(this.translateInstruction(line))
+      }
+    }
+  }
+
+  loadData(data) {
+    // const type = data.type
+    if (!data.data) {
+      return data.value
+    }
+    if (data.data.length > 1) {
+      return data.data.map((x) => x.value)
+    }
+    return data.data[0].value
+  }
+
+  translateArgs(args) {
+    if (!args) {
+      return args
+    }
+    return args.map((arg) => {
+      if (arg.type === 'register') {
+        // resolve register / memory addressing
+        return registerIndices[arg.value]
+      }
+      if (arg.type === 'identifier') {
+        console.log('resolving identifier', arg.value, this.symbolTable[arg.value])
+        return this.symbolTable[arg.value]
+      }
+      return arg.value
+    })
+  }
+
+  translateInstruction(instruction) {
+    const args = this.translateArgs(instruction.args)
+    const mneumonic = instruction.value.toUpperCase()
+    console.log(mneumonic, args)
+    return instructions[mneumonic].apply(null, args).toString(2)
   }
 }
 
 if (require.main === module) {
-  fs.readFile('./examples/simple.asm', 'utf8', (err, data) => {
+  fs.readFile('./examples/add.asm', 'utf8', (err, data) => {
     if (err) {
       // errback
       console.log(err)
       process.exit(-1)
     }
-    run(data)
+    new Assembler(data)
   })
 }
