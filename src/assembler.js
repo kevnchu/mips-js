@@ -8,7 +8,8 @@ const { registerIndices } = require('./registers')
 // const dataSp = 0x10010000
 
 class Assembler {
-  constructor(program) {
+  // TODO make this less bad
+  constructor (program) {
     const { text, data } = parser.parse(program)
     this.instructionTable = {
       _default: []
@@ -28,7 +29,7 @@ class Assembler {
     }
   }
 
-  loadData(data) {
+  loadData (data) {
     // const type = data.type
     if (!data.data) {
       return data.value
@@ -39,7 +40,7 @@ class Assembler {
     return data.data[0].value
   }
 
-  translateArgs(args) {
+  translateArgs (args) {
     if (!args) {
       return args
     }
@@ -49,17 +50,15 @@ class Assembler {
         return registerIndices[arg.value]
       }
       if (arg.type === 'identifier') {
-        console.log('resolving identifier', arg.value, this.symbolTable[arg.value])
         return this.symbolTable[arg.value]
       }
       return arg.value
     })
   }
 
-  translateInstruction(instruction) {
+  translateInstruction (instruction) {
     const args = this.translateArgs(instruction.args)
     const mneumonic = instruction.value.toUpperCase()
-    console.log(mneumonic, args)
     return instructions[mneumonic].apply(null, args).toString(2)
   }
 }
@@ -71,6 +70,7 @@ if (require.main === module) {
       console.log(err)
       process.exit(-1)
     }
-    new Assembler(data)
+    const assembler = new Assembler('li $t1, 12')
+    console.log(assembler.instructionTable)
   })
 }

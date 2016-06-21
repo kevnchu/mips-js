@@ -14,3 +14,4 @@ fs.readFile('./examples/add.asm', 'utf8', (err, data) => {
   emu.loadProgram(program)
   emu.loop()
 })
+
