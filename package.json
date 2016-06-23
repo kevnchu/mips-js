@@ -11,7 +11,10 @@
     "test": "standard && mocha"
   },
   "standard": {
-    "globals": [ "it", "describe" ]
+    "globals": [
+      "it",
+      "describe"
+    ]
   },
   "repository": {
     "type": "git",
@@ -24,6 +27,8 @@
   "license": "MIT",
   "homepage": "https://bitbucket.org/kmczn/spim#readme",
   "devDependencies": {
-    "chai": "^3.5.0"
+    "chai": "^3.5.0",
+    "standard": "~7.1.2",
+    "mocha": "~2.5.3"
   }
 }

@@ -1,17 +1,18 @@
 // constants
-const opcodeShift = 26
-const rsShift = 21
-const rtShift = 16
-const rdShift = 11
-const saShift = 6
-// const funcShift = 0
-
-// const opcodeBits = 6
-// const rsBits = 5
-// const rtBits = 5
-// const rdBits = 5
-// const saBits = 5
-// const funcBits = 6
+const {
+  opcodeShift,
+  rsShift,
+  rtShift,
+  rdShift,
+  saShift,
+  rsMask,
+  rtMask,
+  rdMask,
+  saMask,
+  funcMask,
+  cMask,
+  addrMask
+} = require('./constants')
 
 // Instruction types
 // Type format (bits 31 - 0)
@@ -36,6 +37,33 @@ const iEncode = function (opcode, rs, rt, immediate) {
 
 const jEncode = function (opcode, address) {
   return ((opcode << opcodeShift) + address) >>> 0
+}
+
+const rDecode = (instruction) => {
+  return {
+    opcode: instruction >>> opcodeShift,
+    rs: (instruction >>> rsShift) & rsMask,
+    rt: (instruction >>> rtShift) & rtMask,
+    rd: (instruction >>> rdShift) & rdMask,
+    shamt: (instruction >>> saShift) & saMask,
+    funct: instruction & funcMask
+  }
+}
+
+const iDecode = (instruction) => {
+  return {
+    opcode: instruction >>> opcodeShift,
+    rs: (instruction >>> rsShift) & rsMask,
+    rt: (instruction >>> rtShift) & rtMask,
+    c: instruction & cMask
+  }
+}
+
+const jDecode = (instruction) => {
+  return {
+    opcode: instruction >>> opcodeShift,
+    address: instruction & addrMask
+  }
 }
 
 // Arithmetic
@@ -163,7 +191,13 @@ const instructions = {
   // TODO
   'SYSCALL': function () {
     return 12
-  }
+  },
+  rDecode,
+  rEncode,
+  iDecode,
+  iEncode,
+  jDecode,
+  jEncode
 }
 
 if (require.main === module) {

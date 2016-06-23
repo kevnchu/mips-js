@@ -34,9 +34,9 @@ describe('cpu.js', () => {
     // li $t1, 12
     // addi $t0, $t1, 20
     let program = [873005068, 556269588]
-    cpu.readMem = () => 873005068
+    cpu.readMem = () => program[0]
     cpu.step()
-    cpu.readMem = () => 556269588
+    cpu.readMem = () => program[1]
     cpu.step()
     assert.equal(cpu.registers[registerIndices.$t0], 32)
   })

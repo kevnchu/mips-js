@@ -1,5 +1,7 @@
 // MIPS 32 CPU
 const registers = require('./registers').registerIndices
+const { rDecode, iDecode } = require('./instructions')
+let { opcodeShift } = require('./constants')
 
 // memory segments
 // const textAddress = 0x400000
@@ -13,6 +15,7 @@ const registerCount = 0x20
 class Cpu {
   constructor () {
     // 32KB ram
+    // this should be byte addressable. use Int8Array?
     this.memory = new Uint32Array(memSpace)
     this.registers = new Uint32Array(registerCount)
     this.pc = textAddress
@@ -20,6 +23,7 @@ class Cpu {
     this.registers[registers.$gp] = 0x10008000
   }
 
+  // TODO figure out memory model
   loadProgram (instructions) {
     let addr = textAddress
     instructions.forEach((x, i) => {
@@ -40,42 +44,112 @@ class Cpu {
   step () {
     // fetch instruction
     const instruction = this.readMem(this.pc)
-    const opcode = instruction >> 25
-    switch (opcode) {
-      case 0:
-        const funct = instruction & 0x3f
-        switch (funct) {
-          case 0x20:
-            // add
-            break
-        }
-        break
-      case 0x8:
-        break
-      case 0xa:
-        break
-      case 0xc:
-        break
-      case 0xd:
-        break
-      case 0x20:
-        break
-      case 0x28:
-        break
-      case 0x23:
-        break
-      case 0x2b:
-        break
-      case 0x4:
-        break
-      case 0x5:
-        break
-      case 0x2:
-        break
-      case 0x3:
-      default:
-        break
+    const opcode = instruction >>> opcodeShift
+    if (opcode === 0) {
+      // r format
+      let { rs, rt, rd, shamt, funct } = rDecode(instruction)
+      switch (funct) {
+        case 0:
+          // sll
+          this.registers[rd] = this.registers[rt] << shamt
+          break
+        case 0x2:
+          // srl
+          this.registers[rd] = this.registers[rt] >> shamt
+          break
+        case 0x3:
+          // sra
+          break
+        case 0x4:
+          // sllv
+          this.registers[rd] = this.registers[rt] << this.registers[rs]
+          break
+        case 0x6:
+          // srlv
+          this.registers[rd] = this.registers[rt] >> this.registers[rs]
+          break
+        case 0x7:
+          // srav
+          break
+        case 0x20:
+          // add
+          this.registers[rd] = this.registers[rs] + this.registers[rt]
+          break
+        case 0x22:
+          // sub
+          this.registers[rd] = this.registers[rs] - this.registers[rt]
+          break
+        case 0x18:
+          // mult
+          // TODO
+          break
+        case 0x1a:
+          // div
+          // TODO
+          break
+        case 0x2a:
+          // slt
+          this.registers[rd] = this.registers[rs] < this.registers[rt] ? 1 : 0
+          break
+        case 0x24:
+          // and
+          this.registers[rd] = this.registers[rs] & this.registers[rt]
+          break
+        case 0x25:
+          // or
+          this.registers[rd] = this.registers[rs] & this.registers[rt]
+          break
+        default:
+          // not implemented
+          break
+      }
+    } else if (opcode === 2) {
+      // j
+    } else if (opcode === 3) {
+      // jal
+    } else {
+      // i format
+      let { rs, rt, c } = iDecode(instruction)
+      switch (opcode) {
+        case 0x8:
+          // addi
+          this.registers[rt] = this.registers[rs] + c
+          break
+        case 0xa:
+          // slti
+          this.registers[rt] = this.registers[rs] < c
+          break
+        case 0xc:
+          // andi
+          this.registers[rt] = this.registers[rs] & c
+          break
+        case 0xd:
+          // ori
+          this.registers[rt] = this.registers[rs] | c
+          break
+        case 0x20:
+          // lb
+          break
+        case 0x28:
+          // sb
+          break
+        case 0x23:
+          // lw
+          break
+        case 0x2b:
+          // sw
+          break
+        case 0x4:
+          // beq
+          break
+        case 0x5:
+          // bne
+          break
+        default:
+          break
+      }
     }
+    this.pc = (this.pc + 0x20) >>> 0
   }
 
   loop () {
