@@ -1,20 +1,19 @@
 // converts MIPS instructions into machine instructions / data
-const fs = require('fs')
 const parser = require('./parser')
 const instructions = require('./instructions')
-const { registerIndices } = require('./registers')
-
-// const textSp = 0x00400000
-// const dataSp = 0x10010000
+const registers = require('./registers')
 
 class Assembler {
-  // TODO make this less bad
-  constructor (program) {
-    const { text, data } = parser.parse(program)
+  constructor () {
     this.instructionTable = {
       _default: []
     }
     this.symbolTable = {}
+  }
+
+  compile (program) {
+    const { text, data } = parser.parse(program)
+
     let instructionSegment = this.instructionTable._default
     // load data segment first
     for (let line of data) {
@@ -47,7 +46,7 @@ class Assembler {
     return args.map((arg) => {
       if (arg.type === 'register') {
         // resolve register / memory addressing
-        return registerIndices[arg.value]
+        return registers[arg.value]
       }
       if (arg.type === 'identifier') {
         return this.symbolTable[arg.value]
@@ -59,18 +58,17 @@ class Assembler {
   translateInstruction (instruction) {
     const args = this.translateArgs(instruction.args)
     const mneumonic = instruction.value.toUpperCase()
-    return instructions[mneumonic].apply(null, args).toString(2)
+    return instructions[mneumonic].apply(null, args).toString(16)
   }
 }
 
 if (require.main === module) {
-  fs.readFile('./examples/add.asm', 'utf8', (err, data) => {
-    if (err) {
-      // errback
-      console.log(err)
-      process.exit(-1)
-    }
-    const assembler = new Assembler('li $t1, 12')
+  const instruction = process.argv[2]
+  if (instruction) {
+    const assembler = new Assembler()
+    assembler.compile(instruction)
     console.log(assembler.instructionTable)
-  })
+  }
 }
+
+module.exports = Assembler

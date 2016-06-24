@@ -27,12 +27,10 @@ describe('parser.js', () => {
       let { data } = parser.parse(str)
       assert.equal(data[0].value, 'foo')
 
-      str = [
-        '.data',
-        'foo: .asciiz "hello world"',
-        '.text',
-        'syscall'
-      ].join('\n')
+      str = `.data
+        foo: .asciiz "hello world"
+        .text
+        syscall`
       let output = parser.parse(str)
       data = output.data
       text = output.text

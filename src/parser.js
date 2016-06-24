@@ -16,7 +16,6 @@ class ParseError extends Error {
 }
 
 class Parser {
-
   constructor (input) {
     this.tokenGenerator = scan(input)
     this.getToken = util.generatorAdapter(this.tokenGenerator).getNext
@@ -144,6 +143,19 @@ class Parser {
 
 const parse = (program) => {
   return new Parser(program).parse()
+}
+
+if (require.main === module) {
+  const fs = require('fs')
+  fs.readFile('./examples/add.asm', 'utf8', (err, data) => {
+    if (err) {
+      // errback
+      console.log(err)
+      process.exit(-1)
+    }
+
+    parse(data)
+  })
 }
 
 module.exports = { parse }

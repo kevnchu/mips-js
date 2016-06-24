@@ -8,9 +8,9 @@ const registerNames = [
   '$t8', '$t9', '$k0', '$k1',
   '$gp', '$sp', '$fp', '$ra'
 ]
-let registerIndices = {}
+const registers = {}
 registerNames.forEach((name, index) => {
-  registerIndices[name] = index
+  registers[name] = index
 })
 
-module.exports = { registerNames, registerIndices }
+module.exports = registers

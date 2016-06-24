@@ -1,5 +1,5 @@
 // MIPS 32 CPU
-const registers = require('./registers').registerIndices
+const registers = require('./registers')
 const { rDecode, iDecode } = require('./instructions')
 let { opcodeShift } = require('./constants')
 
@@ -16,8 +16,8 @@ class Cpu {
   constructor () {
     // 32KB ram
     // this should be byte addressable. use Int8Array?
-    this.memory = new Uint32Array(memSpace)
-    this.registers = new Uint32Array(registerCount)
+    this.memory = new Int32Array(memSpace)
+    this.registers = new Int32Array(registerCount)
     this.pc = textAddress
 
     this.registers[registers.$gp] = 0x10008000
