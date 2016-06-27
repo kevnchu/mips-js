@@ -97,7 +97,7 @@ class Cpu {
           break
         case 0x25:
           // or
-          this.registers[rd] = this.registers[rs] & this.registers[rt]
+          this.registers[rd] = this.registers[rs] | this.registers[rt]
           break
         default:
           // not implemented
@@ -128,7 +128,9 @@ class Cpu {
           this.registers[rt] = this.registers[rs] | c
           break
         case 0x20:
-          // lb
+          // lb $t,C($s)
+          // TODO
+          this.registers[rt] = this.readMem(rs + c)
           break
         case 0x28:
           // sb

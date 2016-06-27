@@ -107,45 +107,134 @@ describe('cpu.js', () => {
     assert.equal(cpu.registers[r1], 3)
   })
 
-  // it('sllv', () => {
+  it('sllv', () => {
+    // sllv $t0, $t1, $t2
+    const cpu = new Cpu()
+    let r1 = registers.$t0
+    let r2 = registers.$t1
+    let r3 = registers.$t2
+    cpu.registers[r2] = 13
+    cpu.registers[r3] = 4
+    cpu.readMem = () => 0x1494004
+    cpu.step()
+    assert.equal(cpu.registers[r1], 208)
+  })
 
-  // })
+  it('srlv', () => {
+    // srlv $t0, $t1, $t2
+    const cpu = new Cpu()
+    let r1 = registers.$t0
+    let r2 = registers.$t1
+    let r3 = registers.$t2
+    cpu.registers[r2] = 13
+    cpu.registers[r3] = 2
+    cpu.readMem = () => 0x1494006
+    cpu.step()
+    assert.equal(cpu.registers[r1], 3)
+  })
 
-  // it('srlv', () => {
+  it('slt', () => {
+    // slt $t0, $t1, $t2
+    const cpu = new Cpu()
+    let r1 = registers.$t0
+    let r2 = registers.$t1
+    let r3 = registers.$t2
+    cpu.registers[r2] = 13
+    cpu.registers[r3] = 2
+    cpu.readMem = () => 0x12a402a
+    cpu.step()
+    assert.equal(cpu.registers[r1], 0)
 
-  // })
+    cpu.registers[r2] = 13
+    cpu.registers[r3] = 13
+    cpu.step()
+    assert.equal(cpu.registers[r1], 0)
 
-  // it('slt', () => {
+    cpu.registers[r2] = 13
+    cpu.registers[r3] = 14
+    cpu.step()
+    assert.equal(cpu.registers[r1], 1)
+  })
 
-  // })
+  it('and', () => {
+    // and $t0, $t1, $t2
+    const cpu = new Cpu()
+    let r1 = registers.$t0
+    let r2 = registers.$t1
+    let r3 = registers.$t2
+    cpu.registers[r2] = 3321
+    cpu.registers[r3] = 243321
+    cpu.readMem = () => 0x12a4024
+    cpu.step()
+    assert.equal(cpu.registers[r1], 1145)
+  })
 
-  // it('and', () => {
+  it('or', () => {
+    // and $t0, $t1, $t2
+    const cpu = new Cpu()
+    let r1 = registers.$t0
+    let r2 = registers.$t1
+    let r3 = registers.$t2
+    cpu.registers[r2] = 3321
+    cpu.registers[r3] = 243321
+    cpu.readMem = () => 0x12a4025
+    cpu.step()
+    assert.equal(cpu.registers[r1], 245497)
+  })
 
-  // })
+  it('slti', () => {
+    // slti $t0, $t1, 34
+    const cpu = new Cpu()
+    let r1 = registers.$t0
+    let r2 = registers.$t1
+    cpu.registers[r2] = 13
+    cpu.readMem = () => 0x29280022
+    cpu.step()
+    assert.equal(cpu.registers[r1], 1)
 
-  // it('or', () => {
+    cpu.registers[r2] = 34
+    cpu.step()
+    assert.equal(cpu.registers[r1], 0)
 
-  // })
+    cpu.registers[r2] = 35
+    cpu.step()
+    assert.equal(cpu.registers[r1], 0)
+  })
 
-  // it('slti', () => {
+  it('andi', () => {
+    // andi $t0, $t1, 2345
+    const cpu = new Cpu()
+    let r1 = registers.$t0
+    let r2 = registers.$t1
+    cpu.readMem = () => 0x31280929
+    cpu.registers[r2] = 13
+    cpu.step()
+    assert.equal(cpu.registers[r1], 9)
 
-  // })
+    cpu.registers[r2] = 16
+    cpu.step()
+    assert.equal(cpu.registers[r1], 0)
+  })
 
-  // it('andi', () => {
+  it('ori', () => {
+    // ori $t0, $t1, 732
+    const cpu = new Cpu()
+    let r1 = registers.$t0
+    let r2 = registers.$t1
+    cpu.readMem = () => 0x352802dc
+    cpu.registers[r2] = 35
+    cpu.step()
+    assert.equal(cpu.registers[r1], 767)
 
-  // })
+    cpu.registers[r2] = 16
+    cpu.step()
+    assert.equal(cpu.registers[r1], 732)
+  })
 
-  // it('ori', () => {
-
-  // })
-
-  // it('ori', () => {
-
-  // })
-
-  // it('lb', () => {
-
-  // })
+  it('lb', () => {
+    // TODO
+    assert()
+  })
 
   // it('sb', () => {
 
