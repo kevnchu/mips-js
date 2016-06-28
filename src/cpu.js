@@ -16,8 +16,8 @@ class Cpu {
   constructor () {
     // 32KB ram
     // this should be byte addressable. use Int8Array?
-    this.memory = new Int32Array(memSpace)
-    this.registers = new Int32Array(registerCount)
+    this.memory = new Uint32Array(memSpace)
+    this.registers = new Uint32Array(registerCount)
     this.pc = textAddress
 
     this.registers[registers.$gp] = 0x10008000
@@ -41,9 +41,13 @@ class Cpu {
     this.memory[address] = b
   }
 
+  getInstruction () {
+    return this.readMem(this.pc)
+  }
+
   step () {
     // fetch instruction
-    const instruction = this.readMem(this.pc)
+    const instruction = this.getInstruction()
     const opcode = instruction >>> opcodeShift
     if (opcode === 0) {
       // r format
@@ -101,6 +105,7 @@ class Cpu {
           break
         default:
           // not implemented
+          console.error('func not implemented')
           break
       }
     } else if (opcode === 2) {
@@ -130,16 +135,20 @@ class Cpu {
         case 0x20:
           // lb $t,C($s)
           // TODO
-          this.registers[rt] = this.readMem(rs + c)
+          this.registers[rt] = this.readMem(this.registers[rs] + c) & 0xff
           break
         case 0x28:
           // sb
+          // stores the least-significant 8-bit of a register (a byte) into: MEM[$s+C].
+          // this.writeMem(rs + c, rt & 0xff)
           break
         case 0x23:
           // lw
+          this.registers[rt] = this.readMem(rs + c)
           break
         case 0x2b:
           // sw
+          // this.writeMem(rs + c, rt)
           break
         case 0x4:
           // beq
@@ -148,6 +157,7 @@ class Cpu {
           // bne
           break
         default:
+          console.error('opcode not implemented')
           break
       }
     }

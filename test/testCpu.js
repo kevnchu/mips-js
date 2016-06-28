@@ -71,7 +71,7 @@ describe('cpu.js', () => {
     cpu.registers[r2] = 4
     cpu.registers[r3] = 10
     cpu.step()
-    assert.equal(cpu.registers[r1], -6)
+    assert.equal(cpu.registers[r1] << 0, -6)
   })
 
   it('addi', () => {
@@ -232,8 +232,21 @@ describe('cpu.js', () => {
   })
 
   it('lb', () => {
-    // TODO
-    assert()
+    // TODO handle optional offset
+    // lb $t0, 0($t1)
+    const cpu = new Cpu()
+    let r1 = registers.$t0
+    let r2 = registers.$t1
+    cpu.getInstruction = () => 0x81280000
+    cpu.registers[r2] = 0
+    cpu.memory[0] = 0x1208
+    cpu.step()
+    assert.equal(cpu.registers[r1], 8)
+
+    // lb $t0, 1($t1)
+    cpu.readMem = () => 0x81280001
+    cpu.step()
+    assert.equal(cpu.registers[r1], 0x12)
   })
 
   // it('sb', () => {
