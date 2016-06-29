@@ -231,6 +231,10 @@ describe('cpu.js', () => {
     assert.equal(cpu.registers[r1], 732)
   })
 
+  it('lui', () => {
+    assert()
+  })
+
   it('lb', () => {
     // TODO handle optional offset
     // lb $t0, 0($t1)
@@ -249,7 +253,7 @@ describe('cpu.js', () => {
     assert.equal(cpu.registers[r1], 0x12)
   })
 
-  // it('sb', () => {
-
-  // })
+  it('sb', () => {
+    assert()
+  })
 })

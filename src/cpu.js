@@ -15,10 +15,12 @@ const registerCount = 0x20
 class Cpu {
   constructor () {
     // 32KB ram
-    // this should be byte addressable. use Int8Array?
     this.memory = new Uint32Array(memSpace)
     this.registers = new Uint32Array(registerCount)
     this.pc = textAddress
+
+    // memory map:
+    // 00000000 - 0x00008000  RAM
 
     this.registers[registers.$gp] = 0x10008000
   }
@@ -131,6 +133,10 @@ class Cpu {
         case 0xd:
           // ori
           this.registers[rt] = this.registers[rs] | c
+          break
+        case 0xf:
+          // lui
+          this.registers[rt] = c << 16
           break
         case 0x20:
           // lb $t,C($s)

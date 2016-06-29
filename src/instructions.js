@@ -168,6 +168,11 @@ const instructions = {
     // # ori   $t0, $zero, 50
     return instructions.ORI(rt, 0, c)
   },
+  'LUI': function (rt, c) {
+    // load upper immediate
+    // lui  $t0, C  # $t0 = C << 16
+    return iEncode(0xf, 0, rt, c)
+  },
 
   // conditional
   'BEQ': function (rs, rt, c) {
