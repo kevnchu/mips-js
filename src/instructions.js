@@ -195,7 +195,7 @@ const instructions = {
 
   // TODO
   'SYSCALL': function () {
-    return 12
+    return 0xc
   },
   rDecode,
   rEncode,

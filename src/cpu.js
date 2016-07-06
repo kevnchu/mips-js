@@ -23,6 +23,7 @@ class Cpu {
     // 00000000 - 0x00008000  RAM
 
     this.registers[registers.$gp] = 0x10008000
+    this.registers[registers.$sp] = 0x7ffffffc
   }
 
   // TODO figure out memory model
@@ -32,6 +33,10 @@ class Cpu {
       this.writeMem(addr, x)
       addr = (addr + 0x20) >>> 0
     })
+  }
+
+  addressMap (address) {
+    return (address >>> 4) & 0xffff
   }
 
   readMem (address) {
@@ -45,6 +50,26 @@ class Cpu {
 
   getInstruction () {
     return this.readMem(this.pc)
+  }
+
+  syscall () {
+    const callCode = this.registers[registers.$v0]
+    const arg = this.registers[registers.$a0]
+    switch (callCode) {
+      case 1:
+        // print int
+        console.log(arg)
+        break
+      case 4:
+        // print string
+        // const str = this.readMem(arg)
+        // console.log(str)
+        break
+      case 11:
+        // print char
+        console.log(String.fromCharCode(arg))
+        break
+    }
   }
 
   step () {
@@ -104,6 +129,9 @@ class Cpu {
         case 0x25:
           // or
           this.registers[rd] = this.registers[rs] | this.registers[rt]
+          break
+        case 0xc:
+          this.syscall()
           break
         default:
           // not implemented

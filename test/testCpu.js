@@ -3,10 +3,7 @@ const Cpu = require('../src/cpu')
 const registers = require('../src/registers')
 
 describe('cpu.js', () => {
-  it('initializes the PC', () => {
-    // const cpu = new Cpu()
-    // assert.equal(cpu.pc, 0x400000)
-  })
+  it('initializes the PC')
 
   it('initializes $gp', () => {
     const cpu = new Cpu()
@@ -23,11 +20,12 @@ describe('cpu.js', () => {
     assert.equal(cpu.memory[0x20], program[1])
   })
 
-  it('won\'t write to read only segments of memory', () => {
+  it('won\'t write to read only segments of memory')
+  // () => {
     // const cpu = new Cpu()
     // let fn = cpu.writeMem.bind(cpu, -1, 0)
     // assert.throws(fn)
-  })
+  // })
 
   it('executes instructions', () => {
     const cpu = new Cpu()
@@ -231,9 +229,7 @@ describe('cpu.js', () => {
     assert.equal(cpu.registers[r1], 732)
   })
 
-  it('lui', () => {
-    assert()
-  })
+  it('lui')
 
   it('lb', () => {
     // TODO handle optional offset
@@ -253,7 +249,16 @@ describe('cpu.js', () => {
     assert.equal(cpu.registers[r1], 0x12)
   })
 
-  it('sb', () => {
-    assert()
+  it('sb')
+
+  it('syscall', () => {
+    const cpu = new Cpu()
+    let r1 = registers.$v0
+    let r2 = registers.$a0
+    cpu.registers[r2] = 7
+    cpu.getInstruction = () => 0xc
+    cpu.step()
+
+    // console.log called with 7
   })
 })
