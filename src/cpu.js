@@ -9,7 +9,7 @@ let { opcodeShift } = require('./constants')
 const textAddress = 0
 
 // system params
-const memSpace = 0x8000
+const memSpace = 8192 * 2 + 588
 const registerCount = 0x20
 
 class Cpu {
@@ -20,10 +20,12 @@ class Cpu {
     this.pc = textAddress
 
     // memory map:
-    // 00000000 - 0x00008000  RAM
+    // 0x00400000 - 0x00440000 user text segment (8192 words)
+    // 0x10000000 - 0x1003ffff user data 2048 kb (8192 words)
+    // 0x7ffff6d0 - 0x80000000 stack 2352 bytes (588 words)
 
     this.registers[registers.$gp] = 0x10008000
-    this.registers[registers.$sp] = 0x7ffffffc
+    this.registers[registers.$sp] = 0x7ffff6d0
   }
 
   // TODO figure out memory model
@@ -35,12 +37,32 @@ class Cpu {
     })
   }
 
+  // translates virtual address to physical address
   addressMap (address) {
-    return (address >>> 4) & 0xffff
+    if (address >= 0x00400000 && address < 0x00440000) {
+      address -= 0x00400000
+    } else if (address >= 0x10000000 && address < 0x1003ffff) {
+      // user data segments
+      address -= 0x10000000 - 0x40000
+    } else if (address >= 0x7ffff6d0 && address < 0x80000000) {
+      // stack segment
+      address -= 0x7ffff6d0
+    } else {
+      throw new Error('Segmentation fault ' + address)
+    }
+    return address >>> 5
   }
 
-  readMem (address) {
-    return this.memory[address]
+  // read word from memory
+  // accessLen is length in bytes (1,2,3,4)
+  readMem (address, accessLen = 4) {
+    const word = this.memory[address]
+    let mask = 0
+    for (let i = 0; i < accessLen; i++) {
+      mask = mask << 8
+      mask += 0xff
+    }
+    return word & mask
   }
 
   writeMem (address, b) {
@@ -168,8 +190,25 @@ class Cpu {
           break
         case 0x20:
           // lb $t,C($s)
-          // TODO
-          this.registers[rt] = this.readMem(this.registers[rs] + c) & 0xff
+          // vAddr ← sign_extend(offset) + GPR[base]
+          // (pAddr, CCA)← AddressTranslation (vAddr, DATA, LOAD)
+          // pAddr ← pAddrPSIZE-1..2 || (pAddr1..0 xor ReverseEndian2)
+          // memword← LoadMemory (CCA, BYTE, pAddr, vAddr, DATA)
+          // byte ← vAddr1..0 xor BigEndianCPU2
+          // GPR[rt]← sign_extend(memword7+8*byte..8*byte)
+          const signExtend = (num) => {
+            let value = (num & 0xffff)
+            let sign = num & 0x8000
+            if (sign) {
+              value += 0xffff0000
+            }
+            return value
+          }
+          let offset = signExtend(c)
+          let vAddr = this.registers[rs] + offset
+          let pAddr = this.addressMap(vAddr)
+          let word = this.readMem(pAddr, 1)
+          this.registers[rt] = word
           break
         case 0x28:
           // sb

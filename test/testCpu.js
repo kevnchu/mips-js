@@ -238,27 +238,22 @@ describe('cpu.js', () => {
     let r1 = registers.$t0
     let r2 = registers.$t1
     cpu.getInstruction = () => 0x81280000
-    cpu.registers[r2] = 0
-    cpu.memory[0] = 0x1208
+    cpu.registers[r2] = 0x12121212
+    cpu.registers[r2] = 0x10000000 // should map to index 0 in memory
+    cpu.memory[8192] = 0x88776655 // memory contents
     cpu.step()
-    assert.equal(cpu.registers[r1], 8)
-
-    // lb $t0, 1($t1)
-    cpu.readMem = () => 0x81280001
-    cpu.step()
-    assert.equal(cpu.registers[r1], 0x12)
+    console.log(cpu.registers)
+    assert.equal(cpu.registers[r1], 0xffffff88)
   })
 
   it('sb')
 
   it('syscall', () => {
     const cpu = new Cpu()
-    let r1 = registers.$v0
     let r2 = registers.$a0
     cpu.registers[r2] = 7
     cpu.getInstruction = () => 0xc
     cpu.step()
-
     // console.log called with 7
   })
 })
