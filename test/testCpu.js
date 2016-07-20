@@ -232,21 +232,35 @@ describe('cpu.js', () => {
   it('lui')
 
   it('lb', () => {
-    // TODO handle optional offset
     // lb $t0, 0($t1)
     const cpu = new Cpu()
     let r1 = registers.$t0
     let r2 = registers.$t1
     cpu.getInstruction = () => 0x81280000
-    cpu.registers[r2] = 0x12121212
+    cpu.registers[r1] = 0x12121212
     cpu.registers[r2] = 0x10000000 // should map to index 0 in memory
+    // FIXME shouldn't require knowledge of physical mem location
     cpu.memory[8192] = 0x88776655 // memory contents
     cpu.step()
-    console.log(cpu.registers)
+    assert.equal(cpu.registers[r1], 0x55)
+
+    cpu.getInstruction = () => 0x81280001
+    cpu.step()
+    assert.equal(cpu.registers[r1], 0x66)
+
+    cpu.getInstruction = () => 0x81280002
+    cpu.step()
+    assert.equal(cpu.registers[r1], 0x77)
+
+    cpu.getInstruction = () => 0x81280003
+    cpu.step()
     assert.equal(cpu.registers[r1], 0xffffff88)
   })
 
-  it('sb')
+  it('sb', () => {
+    // sb $t0, 0($t1)
+
+  })
 
   it('syscall', () => {
     const cpu = new Cpu()

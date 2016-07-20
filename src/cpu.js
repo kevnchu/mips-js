@@ -12,6 +12,15 @@ const textAddress = 0
 const memSpace = 8192 * 2 + 588
 const registerCount = 0x20
 
+const signExtend16 = (num) => {
+  let value = (num & 0xffff)
+  const sign = num & 0x8000
+  if (sign) {
+    value += 0xffff0000
+  }
+  return value
+}
+
 class Cpu {
   constructor () {
     // 32KB ram
@@ -188,7 +197,7 @@ class Cpu {
           // lui
           this.registers[rt] = c << 16
           break
-        case 0x20:
+        case 0x20: {
           // lb $t,C($s)
           // vAddr ← sign_extend(offset) + GPR[base]
           // (pAddr, CCA)← AddressTranslation (vAddr, DATA, LOAD)
@@ -196,24 +205,20 @@ class Cpu {
           // memword← LoadMemory (CCA, BYTE, pAddr, vAddr, DATA)
           // byte ← vAddr1..0 xor BigEndianCPU2
           // GPR[rt]← sign_extend(memword7+8*byte..8*byte)
-          const signExtend = (num) => {
-            let value = (num & 0xffff)
-            let sign = num & 0x8000
-            if (sign) {
-              value += 0xffff0000
-            }
-            return value
-          }
-          let offset = signExtend(c)
+          const offset = signExtend16(c)
           let vAddr = this.registers[rs] + offset
           let pAddr = this.addressMap(vAddr)
-          let word = this.readMem(pAddr, 1)
-          this.registers[rt] = word
-          break
+          let word = this.readMem(pAddr)
+          let mask = 0xff << (8 * offset)
+          let byte = (word & mask) >> (8 * offset)
+          this.registers[rt] = byte
+          break }
         case 0x28:
           // sb
           // stores the least-significant 8-bit of a register (a byte) into: MEM[$s+C].
           // this.writeMem(rs + c, rt & 0xff)
+          const offset = signExtend16(c)
+          let vAddr
           break
         case 0x23:
           // lw
