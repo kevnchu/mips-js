@@ -74,9 +74,8 @@ class Cpu {
     return word & mask
   }
 
-  writeMem (address, b) {
-    // TODO check if memory is writable
-    this.memory[address] = b
+  writeMem (address, data, accessLen) {
+    this.memory[address] = data
   }
 
   getInstruction () {
@@ -212,14 +211,27 @@ class Cpu {
           let mask = 0xff << (8 * offset)
           let byte = (word & mask) >> (8 * offset)
           this.registers[rt] = byte
-          break }
-        case 0x28:
+          break
+        }
+        case 0x28: {
           // sb
           // stores the least-significant 8-bit of a register (a byte) into: MEM[$s+C].
           // this.writeMem(rs + c, rt & 0xff)
+
+          // vAddr ← sign_extend(offset) + GPR[base]
+          // (pAddr, CCA)← AddressTranslation (vAddr, DATA, STORE)
+          // pAddr ← pAddrPSIZE-1..2 || (pAddr1..0 xor ReverseEndian2)
+          // bytesel ← vAddr1..0 xor BigEndianCPU2
+          // dataword ← GPR[rt]31–8*bytesel..0 || 08*bytesel
+          // StoreMemory (CCA, BYTE, dataword, pAddr, vAddr, DATA)
           const offset = signExtend16(c)
-          let vAddr
+          let vAddr = this.registers[rs] + offset
+          let pAddr = this.addressMap(vAddr)
+          let byte = this.registers[rt] & 0xff
+          // TODO write byte only.
+          this.writeMem(pAddr, byte, 1)
           break
+        }
         case 0x23:
           // lw
           this.registers[rt] = this.readMem(rs + c)

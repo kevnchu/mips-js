@@ -236,11 +236,11 @@ describe('cpu.js', () => {
     const cpu = new Cpu()
     let r1 = registers.$t0
     let r2 = registers.$t1
-    cpu.getInstruction = () => 0x81280000
     cpu.registers[r1] = 0x12121212
     cpu.registers[r2] = 0x10000000 // should map to index 0 in memory
     // FIXME shouldn't require knowledge of physical mem location
     cpu.memory[8192] = 0x88776655 // memory contents
+    cpu.getInstruction = () => 0x81280000
     cpu.step()
     assert.equal(cpu.registers[r1], 0x55)
 
@@ -258,8 +258,15 @@ describe('cpu.js', () => {
   })
 
   it('sb', () => {
-    // sb $t0, 0($t1)
-
+    // sb $t0, 0($t1) # a1280000
+    const cpu = new Cpu()
+    let r1 = registers.$t0
+    let r2 = registers.$t1
+    cpu.getInstruction = () => 0xa1280000
+    cpu.registers[r1] = 0x88888811
+    cpu.registers[r2] = 0x10000000 // should map to index 0 in memory
+    cpu.step()
+    assert.equal(cpu.memory[8192], 0x11)
   })
 
   it('syscall', () => {
