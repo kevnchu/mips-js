@@ -270,11 +270,22 @@ describe('cpu.js', () => {
   })
 
   it('syscall', () => {
+    let _log
+    let _magicNum
+    // TODO use function spy
+    _log = console.log
+    console.log = (num) => {
+      _magicNum = num
+    }
     const cpu = new Cpu()
-    let r2 = registers.$a0
+    const r1 = registers.$v0
+    const r2 = registers.$a0
+    cpu.registers[r1] = 1
     cpu.registers[r2] = 7
     cpu.getInstruction = () => 0xc
     cpu.step()
+    console.log = _log
     // console.log called with 7
+    assert.equal(_magicNum, 7)
   })
 })
