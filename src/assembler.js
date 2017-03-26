@@ -26,6 +26,7 @@ class Assembler {
         instructionSegment.push(this.translateInstruction(line))
       }
     }
+    return instructionSegment
   }
 
   loadData (data) {
@@ -65,9 +66,10 @@ class Assembler {
 if (require.main === module) {
   const instruction = process.argv[2]
   if (instruction) {
+    console.log('Assembly ->', instruction)
     const assembler = new Assembler()
     assembler.compile(instruction)
-    console.log(assembler.instructionTable)
+    console.log('Binary ->', assembler.instructionTable)
   }
 }
 

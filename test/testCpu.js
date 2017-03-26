@@ -20,12 +20,11 @@ describe('cpu.js', () => {
     assert.equal(cpu.memory[0x20], program[1])
   })
 
-  it('won\'t write to read only segments of memory')
-  // () => {
-    // const cpu = new Cpu()
-    // let fn = cpu.writeMem.bind(cpu, -1, 0)
-    // assert.throws(fn)
-  // })
+  it('won\'t write to read only segments of memory', () => {
+    const cpu = new Cpu()
+    let fn = cpu.writeMem.bind(cpu, -1, 0)
+    assert.throws(fn)
+  })
 
   it('executes instructions', () => {
     const cpu = new Cpu()
@@ -129,6 +128,20 @@ describe('cpu.js', () => {
     cpu.readMem = () => 0x1494006
     cpu.step()
     assert.equal(cpu.registers[r1], 3)
+  })
+
+  it('jr', () => {
+    // $t0 -> 0x400000
+    // jr $t0
+    const cpu = new Cpu()
+    let rs = registers.$t0
+    // rs -> target address
+    cpu.registers[rs] = 0x400000
+    // instruction binary
+    cpu.readMem = () => 0x1000008
+    cpu.step()
+    // target address loaded into pc
+    assert.equal(cpu.pc, 0x400000)
   })
 
   it('slt', () => {

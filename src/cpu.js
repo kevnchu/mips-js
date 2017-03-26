@@ -74,7 +74,11 @@ class Cpu {
     return word & mask
   }
 
+  // writes data to 'physical' address
   writeMem (address, data, accessLen) {
+    if (address < 0 || address >= this.memory.length) {
+      throw new Error(`Invalid memory address ${address}`)
+    }
     this.memory[address] = data
   }
 
@@ -104,6 +108,7 @@ class Cpu {
 
   step () {
     // fetch instruction
+    let incPc = true
     const instruction = this.getInstruction()
     const opcode = instruction >>> opcodeShift
     if (opcode === 0) {
@@ -131,6 +136,12 @@ class Cpu {
           break
         case 0x7:
           // srav
+          break
+        case 0x8:
+          // jr
+          // Jump to the effective target address in GPR rs. Execute the instruction following the jump, in the branch delay slot, before jumping
+          this.pc = this.registers[rs]
+          incPc = false
           break
         case 0x20:
           // add
@@ -251,7 +262,9 @@ class Cpu {
           break
       }
     }
-    this.pc = (this.pc + 0x20) >>> 0
+    if (incPc) {
+      this.pc = (this.pc + 0x20) >>> 0
+    }
   }
 
   loop () {
