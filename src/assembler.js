@@ -59,7 +59,8 @@ class Assembler {
   translateInstruction (instruction) {
     const args = this.translateArgs(instruction.args)
     const mneumonic = instruction.value.toUpperCase()
-    return instructions[mneumonic].apply(null, args).toString(16)
+    const val = instructions[mneumonic].apply(null, args).toString(16)
+    return '0x' + val
   }
 }
 

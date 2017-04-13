@@ -66,6 +66,17 @@ const jDecode = (instruction) => {
   }
 }
 
+const decode = function (instruction) {
+  const opcode = instruction >>> opcodeShift
+  if (opcode === 0) {
+    return rDecode(instruction)
+  }
+  if (opcode === 2 || opcode === 3) {
+    return jDecode(instruction)
+  }
+  return iDecode(instruction)
+}
+
 // Arithmetic
 // ADD, ADDI, SUB, MULT*, DIV*, SLT, SLTI
 // Logic
@@ -202,7 +213,8 @@ const instructions = {
   iDecode,
   iEncode,
   jDecode,
-  jEncode
+  jEncode,
+  decode
 }
 
 if (require.main === module) {

@@ -63,19 +63,15 @@ class Cpu {
   }
 
   // read word from memory
-  // accessLen is length in bytes (1,2,3,4)
-  readMem (address, accessLen = 4) {
-    const word = this.memory[address]
-    let mask = 0
-    for (let i = 0; i < accessLen; i++) {
-      mask = mask << 8
-      mask += 0xff
+  readMem (address) {
+    if (address < 0 || address >= this.memory.length) {
+      throw new Error(`Invalid memory address ${address}`)
     }
-    return word & mask
+    return this.memory[address]
   }
 
   // writes data to 'physical' address
-  writeMem (address, data, accessLen) {
+  writeMem (address, data) {
     if (address < 0 || address >= this.memory.length) {
       throw new Error(`Invalid memory address ${address}`)
     }
@@ -236,11 +232,12 @@ class Cpu {
           // dataword ← GPR[rt]31–8*bytesel..0 || 08*bytesel
           // StoreMemory (CCA, BYTE, dataword, pAddr, vAddr, DATA)
           const offset = signExtend16(c)
-          let vAddr = this.registers[rs] + offset
-          let pAddr = this.addressMap(vAddr)
-          let byte = this.registers[rt] & 0xff
+          const vAddr = this.registers[rs] + offset
+          const pAddr = this.addressMap(vAddr)
+          const byte = this.registers[rt] & 0xff
+
           // TODO write byte only.
-          this.writeMem(pAddr, byte, 1)
+          this.writeMem(pAddr, byte, offset, 1)
           break
         }
         case 0x23:

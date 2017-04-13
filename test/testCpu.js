@@ -3,6 +3,11 @@ const Cpu = require('../src/cpu')
 const registers = require('../src/registers')
 
 describe('cpu.js', () => {
+  const executeInstruction = (cpu, instruction) => {
+    cpu.getInstruction = () => instruction
+    cpu.step()
+  }
+
   it('initializes the PC')
 
   it('initializes $gp', () => {
@@ -20,9 +25,12 @@ describe('cpu.js', () => {
     assert.equal(cpu.memory[0x20], program[1])
   })
 
-  it('won\'t write to read only segments of memory', () => {
+  it('throws on read/write to invalid memory location', () => {
     const cpu = new Cpu()
     let fn = cpu.writeMem.bind(cpu, -1, 0)
+    assert.throws(fn)
+
+    fn = cpu.readMem.bind(cpu, -1)
     assert.throws(fn)
   })
 
@@ -31,9 +39,9 @@ describe('cpu.js', () => {
     // li $t1, 12
     // addi $t0, $t1, 20
     let program = [873005068, 556269588]
-    cpu.readMem = () => program[0]
+    cpu.getInstruction = () => program[0]
     cpu.step()
-    cpu.readMem = () => program[1]
+    cpu.getInstruction = () => program[1]
     cpu.step()
     assert.equal(cpu.registers[registers.$t0], 32)
   })
@@ -47,7 +55,7 @@ describe('cpu.js', () => {
     cpu.registers[r1] = 9
     cpu.registers[r2] = 4
     cpu.registers[r3] = 10
-    cpu.readMem = () => 0x12a4020
+    cpu.getInstruction = () => 0x12a4020
     cpu.step()
     assert.equal(cpu.registers[r1], 14)
   })
@@ -61,7 +69,7 @@ describe('cpu.js', () => {
     cpu.registers[r1] = 2355
     cpu.registers[r2] = 234
     cpu.registers[r3] = 35
-    cpu.readMem = () => 0x12a4022
+    cpu.getInstruction = () => 0x12a4022
     cpu.step()
     assert.equal(cpu.registers[r1], 199)
 
@@ -77,7 +85,7 @@ describe('cpu.js', () => {
     let r1 = registers.$t0
     let r2 = registers.$t1
     cpu.registers[r2] = 4
-    cpu.readMem = () => 0x21285b8a
+    cpu.getInstruction = () => 0x21285b8a
     cpu.step()
     assert.equal(cpu.registers[r1], 23438)
   })
@@ -88,7 +96,7 @@ describe('cpu.js', () => {
     let r1 = registers.$t0
     let r2 = registers.$t1
     cpu.registers[r2] = 13
-    cpu.readMem = () => 0x94100
+    cpu.getInstruction = () => 0x94100
     cpu.step()
     assert.equal(cpu.registers[r1], 208)
   })
@@ -99,7 +107,7 @@ describe('cpu.js', () => {
     let r1 = registers.$t0
     let r2 = registers.$t1
     cpu.registers[r2] = 13
-    cpu.readMem = () => 0x94082
+    cpu.getInstruction = () => 0x94082
     cpu.step()
     assert.equal(cpu.registers[r1], 3)
   })
@@ -112,7 +120,7 @@ describe('cpu.js', () => {
     let r3 = registers.$t2
     cpu.registers[r2] = 13
     cpu.registers[r3] = 4
-    cpu.readMem = () => 0x1494004
+    cpu.getInstruction = () => 0x1494004
     cpu.step()
     assert.equal(cpu.registers[r1], 208)
   })
@@ -125,7 +133,7 @@ describe('cpu.js', () => {
     let r3 = registers.$t2
     cpu.registers[r2] = 13
     cpu.registers[r3] = 2
-    cpu.readMem = () => 0x1494006
+    cpu.getInstruction = () => 0x1494006
     cpu.step()
     assert.equal(cpu.registers[r1], 3)
   })
@@ -138,7 +146,7 @@ describe('cpu.js', () => {
     // rs -> target address
     cpu.registers[rs] = 0x400000
     // instruction binary
-    cpu.readMem = () => 0x1000008
+    cpu.getInstruction = () => 0x1000008
     cpu.step()
     // target address loaded into pc
     assert.equal(cpu.pc, 0x400000)
@@ -152,7 +160,7 @@ describe('cpu.js', () => {
     let r3 = registers.$t2
     cpu.registers[r2] = 13
     cpu.registers[r3] = 2
-    cpu.readMem = () => 0x12a402a
+    cpu.getInstruction = () => 0x12a402a
     cpu.step()
     assert.equal(cpu.registers[r1], 0)
 
@@ -175,7 +183,7 @@ describe('cpu.js', () => {
     let r3 = registers.$t2
     cpu.registers[r2] = 3321
     cpu.registers[r3] = 243321
-    cpu.readMem = () => 0x12a4024
+    cpu.getInstruction = () => 0x12a4024
     cpu.step()
     assert.equal(cpu.registers[r1], 1145)
   })
@@ -188,7 +196,7 @@ describe('cpu.js', () => {
     let r3 = registers.$t2
     cpu.registers[r2] = 3321
     cpu.registers[r3] = 243321
-    cpu.readMem = () => 0x12a4025
+    cpu.getInstruction = () => 0x12a4025
     cpu.step()
     assert.equal(cpu.registers[r1], 245497)
   })
@@ -199,7 +207,7 @@ describe('cpu.js', () => {
     let r1 = registers.$t0
     let r2 = registers.$t1
     cpu.registers[r2] = 13
-    cpu.readMem = () => 0x29280022
+    cpu.getInstruction = () => 0x29280022
     cpu.step()
     assert.equal(cpu.registers[r1], 1)
 
@@ -217,8 +225,8 @@ describe('cpu.js', () => {
     const cpu = new Cpu()
     let r1 = registers.$t0
     let r2 = registers.$t1
-    cpu.readMem = () => 0x31280929
     cpu.registers[r2] = 13
+    cpu.getInstruction = () => 0x31280929
     cpu.step()
     assert.equal(cpu.registers[r1], 9)
 
@@ -232,8 +240,8 @@ describe('cpu.js', () => {
     const cpu = new Cpu()
     let r1 = registers.$t0
     let r2 = registers.$t1
-    cpu.readMem = () => 0x352802dc
     cpu.registers[r2] = 35
+    cpu.getInstruction = () => 0x352802dc
     cpu.step()
     assert.equal(cpu.registers[r1], 767)
 
@@ -275,11 +283,28 @@ describe('cpu.js', () => {
     const cpu = new Cpu()
     let r1 = registers.$t0
     let r2 = registers.$t1
-    cpu.getInstruction = () => 0xa1280000
     cpu.registers[r1] = 0x88888811
-    cpu.registers[r2] = 0x10000000 // should map to index 0 in memory
-    cpu.step()
-    assert.equal(cpu.memory[8192], 0x11)
+    cpu.registers[r2] = 0x10000000 // index 0 in memory
+    // cpu.getInstruction = () => 0xa1280000
+    // cpu.step()
+    executeInstruction(cpu, 0xa1280000)
+
+    // sb $t0, 1($t1) # 0xa1280001
+    cpu.registers[r1] = 0x88888822
+    executeInstruction(cpu, 0xa1280001)
+
+    // assert.equal(cpu.memory[8192], 0x11)
+
+    // sb $t0, 2($t1) # 0xa1280002
+    cpu.registers[r1] = 0x88888833
+    executeInstruction(cpu, 0xa1280002)
+    // assert.equal(cpu.memory[8192], 0x11)
+
+    // sb $t0, 3($t1) # 0xa1280003
+    cpu.registers[r1] = 0x88888844
+    executeInstruction(cpu, 0xa1280003)
+    // // assert.equal(cpu.memory[8192], 0x11)
+    assert.equal(cpu.memory[8192], 0x44332211)
   })
 
   it('syscall', () => {
