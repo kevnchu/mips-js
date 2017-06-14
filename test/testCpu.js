@@ -1,6 +1,6 @@
-const assert = require('chai').assert
-const Cpu = require('../src/cpu')
-const registers = require('../src/registers')
+import { assert } from 'chai'
+import Cpu from '../src/cpu'
+import { registers } from '../src/registers'
 
 describe('cpu.js', () => {
   const executeInstruction = (cpu, instruction) => {

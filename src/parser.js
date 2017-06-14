@@ -3,9 +3,8 @@
 // [(label, type, value)]
 // text:
 // [(instruction, operands)]
-
-const scan = require('./scanner').scan
-const util = require('./util')
+import { scan } from './scanner'
+import util from './util'
 
 class ParseError extends Error {
   constructor (message) {
@@ -141,7 +140,7 @@ class Parser {
   }
 }
 
-const parse = (program) => {
+export const parse = (program) => {
   return new Parser(program).parse()
 }
 
@@ -159,5 +158,3 @@ if (require.main === module) {
   })
 }
 */
-
-module.exports = { parse }

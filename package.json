@@ -8,15 +8,14 @@
     "test": "test"
   },
   "scripts": {
-    "test": "standard && mocha"
+    "test": "standard && mocha --require babel-polyfill --compilers js:babel-register"
   },
   "standard": {
     "globals": [
       "it",
       "describe"
     ],
-    "ignore": [
-    ]
+    "ignore": []
   },
   "repository": {
     "type": "git",
@@ -34,6 +33,7 @@
     "babel-polyfill": "^6.23.0",
     "babel-preset-env": "^1.5.2",
     "babel-preset-react": "^6.24.1",
+    "babel-register": "^6.24.1",
     "chai": "^3.5.0",
     "mocha": "~2.5.3",
     "sinon": "^1.17.4",

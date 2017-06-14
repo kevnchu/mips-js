@@ -3,7 +3,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import Assembler from './assembler'
-import instructions from './instructions'
+import { decode } from './instructions'
 import Cpu from './cpu'
 import RegistersView from './ui/registers.jsx'
 
@@ -26,7 +26,7 @@ const cpu = new Cpu()
 const instructionList = assembler.compile(data)
 instructionList.forEach((inst) => {
   console.log('binary', inst)
-  console.log(instructions.decode(inst))
+  console.log(decode(inst))
 })
 
 cpu.loadProgram(instructionList)

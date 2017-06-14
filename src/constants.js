@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   opcodeShift: 26,
   rsShift: 21,
   rtShift: 16,

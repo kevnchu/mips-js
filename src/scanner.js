@@ -10,9 +10,9 @@
 // Numbers are base 10 by default.  0x prefix indicates hexadecimal.
 // Strings are enclosed in quotes.  May include \n=newline or \t=tab.  Used for prompts.
 
-const instructions = require('./instructions')
-const Token = require('./token')
-const util = require('./util')
+import { instructions } from './instructions'
+import Token from './token'
+import util from './util'
 
 const isInstruction = (str) => {
   return instructions.hasOwnProperty(str.toUpperCase())
@@ -162,8 +162,6 @@ class Tokenizer {
 }
 
 // generator function returns an iterable that yields tokens
-const scan = (program) => {
+export const scan = (program) => {
   return new Tokenizer(program).tokenize()
 }
-
-module.exports = { scan }

@@ -1,7 +1,8 @@
 // MIPS 32 CPU
-const registers = require('./registers')
-const { rDecode, iDecode } = require('./instructions')
-let { opcodeShift } = require('./constants')
+import { registers } from './registers'
+import { rDecode, iDecode } from './instructions'
+import constants from './constants'
+const { opcodeShift } = constants
 
 // memory segments
 // const textAddress = 0x400000
@@ -21,7 +22,7 @@ const signExtend16 = (num) => {
   return value
 }
 
-class Cpu {
+export default class Cpu {
   constructor () {
     // 32KB ram
     this.memory = new Uint32Array(memSpace)
@@ -270,5 +271,3 @@ class Cpu {
     }
   }
 }
-
-module.exports = Cpu

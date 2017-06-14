@@ -1,5 +1,7 @@
-const assert = require('chai').assert
-const Assembler = require('../src/assembler')
+// const assert = require('chai').assert
+// const Assembler = require('../src/assembler')
+import { assert } from 'chai'
+import Assembler from '../src/assembler'
 
 describe('assembler.js', () => {
   it('encodes r-form instructions', () => {

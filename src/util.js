@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   generatorAdapter: (iterable) => {
     let index = 0
     const generatorFn = function * () {

@@ -1,9 +1,13 @@
 // converts MIPS instructions into machine instructions / data
-const parser = require('./parser')
-const instructions = require('./instructions')
-const registers = require('./registers')
+// const parser = require('./parser')
+// const instructions = require('./instructions')
+// const { registers } = require('./registers')
 
-class Assembler {
+import { parse } from './parser'
+import { instructions } from './instructions'
+import { registers } from './registers'
+
+export default class Assembler {
   constructor () {
     this.instructionTable = {
       _default: []
@@ -12,7 +16,7 @@ class Assembler {
   }
 
   compile (program) {
-    const { text, data } = parser.parse(program)
+    const { text, data } = parse(program)
 
     let instructionSegment = this.instructionTable._default
     // load data segment first
@@ -64,14 +68,12 @@ class Assembler {
   }
 }
 
-if (require.main === module) {
-  const instruction = process.argv[2]
-  if (instruction) {
-    console.log('Assembly ->', instruction)
-    const assembler = new Assembler()
-    assembler.compile(instruction)
-    console.log('Binary ->', assembler.instructionTable)
-  }
-}
-
-module.exports = Assembler
+// if (require.main === module) {
+//   const instruction = process.argv[2]
+//   if (instruction) {
+//     console.log('Assembly ->', instruction)
+//     const assembler = new Assembler()
+//     assembler.compile(instruction)
+//     console.log('Binary ->', assembler.instructionTable)
+//   }
+// }

@@ -1,4 +1,5 @@
 // constants
+import constants from './constants'
 const {
   opcodeShift,
   rsShift,
@@ -12,14 +13,14 @@ const {
   funcMask,
   cMask,
   addrMask
-} = require('./constants')
+} = constants
 
 // Instruction types
 // Type format (bits 31 - 0)
 // R	opcode (6)	rs (5)	rt (5)	rd (5)	shamt (5)	funct (6)
 // I	opcode (6)	rs (5)	rt (5)	immediate (16)
 // J	opcode (6)	address (26)
-const rEncode = function (opcode, rs, rt, rd, shamt, funct) {
+export const rEncode = function (opcode, rs, rt, rd, shamt, funct) {
   return ((opcode << opcodeShift) +
     (rs << rsShift) +
     (rt << rtShift) +
@@ -28,18 +29,18 @@ const rEncode = function (opcode, rs, rt, rd, shamt, funct) {
     funct) >>> 0
 }
 
-const iEncode = function (opcode, rs, rt, immediate) {
+export const iEncode = function (opcode, rs, rt, immediate) {
   return ((opcode << opcodeShift) +
     (rs << rsShift) +
     (rt << rtShift) +
     immediate) >>> 0
 }
 
-const jEncode = function (opcode, address) {
+export const jEncode = function (opcode, address) {
   return ((opcode << opcodeShift) + address) >>> 0
 }
 
-const rDecode = (instruction) => {
+export const rDecode = (instruction) => {
   return {
     opcode: instruction >>> opcodeShift,
     rs: (instruction >>> rsShift) & rsMask,
@@ -50,7 +51,7 @@ const rDecode = (instruction) => {
   }
 }
 
-const iDecode = (instruction) => {
+export const iDecode = (instruction) => {
   return {
     opcode: instruction >>> opcodeShift,
     rs: (instruction >>> rsShift) & rsMask,
@@ -59,14 +60,14 @@ const iDecode = (instruction) => {
   }
 }
 
-const jDecode = (instruction) => {
+export const jDecode = (instruction) => {
   return {
     opcode: instruction >>> opcodeShift,
     address: instruction & addrMask
   }
 }
 
-const decode = function (instruction) {
+export const decode = function (instruction) {
   const opcode = instruction >>> opcodeShift
   if (opcode === 0) {
     return rDecode(instruction)
@@ -88,7 +89,7 @@ const decode = function (instruction) {
 // Random
 // SYSCALL, NOP, RFE, BREAK
 
-const instructions = {
+export const instructions = {
   // Arithmetic
   // 000000 01010 01011 01100 00000 100000   # add $12, $10, $11
   // 0      10    11    12    0     32
@@ -207,18 +208,5 @@ const instructions = {
   // TODO
   'SYSCALL': function () {
     return 0xc
-  },
-  rDecode,
-  rEncode,
-  iDecode,
-  iEncode,
-  jDecode,
-  jEncode,
-  decode
+  }
 }
-
-if (require.main === module) {
-
-}
-
-module.exports = instructions

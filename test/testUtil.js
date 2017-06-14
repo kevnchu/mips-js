@@ -1,5 +1,5 @@
-const assert = require('chai').assert
-const util = require('../src/util')
+import { assert } from 'chai'
+import util from '../src/util'
 
 describe('util.js', () => {
   describe('generatorAdapter', () => {
