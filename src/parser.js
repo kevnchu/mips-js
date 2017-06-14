@@ -145,6 +145,7 @@ const parse = (program) => {
   return new Parser(program).parse()
 }
 
+/*
 if (require.main === module) {
   const fs = require('fs')
   fs.readFile('./examples/add.asm', 'utf8', (err, data) => {
@@ -157,5 +158,6 @@ if (require.main === module) {
     parse(data)
   })
 }
+*/
 
 module.exports = { parse }

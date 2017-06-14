@@ -1,36 +1,48 @@
 {
-  "name": "spim",
+  "name": "mips-js",
   "version": "1.0.0",
   "description": "MIPS32 assembler and emulator",
-  "main": "index.js",
+  "main": "src/main.js",
   "directories": {
     "example": "examples",
     "test": "test"
   },
   "scripts": {
-    "start": "node index.js",
     "test": "standard && mocha"
   },
   "standard": {
     "globals": [
       "it",
       "describe"
+    ],
+    "ignore": [
     ]
   },
   "repository": {
     "type": "git",
-    "url": "git+https://kmczn@bitbucket.org/kmczn/spim.git"
+    "url": "git://github.com/kevnchu/mips-js.git"
   },
   "keywords": [
     "MIPS"
   ],
   "author": "Kevin Chu",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/kmczn/spim#readme",
+  "homepage": "https://github.com/kevnchu/mips-js",
   "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.0.0",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-env": "^1.5.2",
+    "babel-preset-react": "^6.24.1",
     "chai": "^3.5.0",
     "mocha": "~2.5.3",
     "sinon": "^1.17.4",
-    "standard": "~7.1.2"
+    "standard": "~7.1.2",
+    "webpack": "^2.6.1",
+    "webpack-dev-server": "^2.4.5"
+  },
+  "dependencies": {
+    "react": "^15.6.0",
+    "react-dom": "^15.6.0"
   }
 }
