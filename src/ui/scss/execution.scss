@@ -1,0 +1,19 @@
+.execution-container {
+  button {
+    color: black;
+  }
+
+  textarea {
+    display: block;
+    resize: none;
+    border-radius: 3px;
+    border-color: #fff;
+    height: 400px;
+    width: 300px;
+    margin: 20px 0 10px 0;
+
+    &.input-dirty {
+      color: black;
+    }
+  }
+}

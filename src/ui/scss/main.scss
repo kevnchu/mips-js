@@ -1,0 +1,34 @@
+@import 'registers';
+@import 'execution';
+
+$color-1: #E4DFDA;
+$color-2: #4E3D42;
+$color-3: #43AA8B;
+$color-4: #F28F3B;
+$color-5: #EF3054;
+$defaultMargin: 20px;
+
+* {
+  font-family: Menlo, Courier, monospace;
+  color: $color-5;
+}
+
+body {
+  background-color: $color-1;
+}
+
+.flex-container {
+  display: flex;
+
+  > section {
+    flex: 1;
+  }
+}
+
+header, footer {
+  margin: $defaultMargin;
+}
+
+#root {
+  margin: $defaultMargin;
+}
