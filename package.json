@@ -8,7 +8,10 @@
     "test": "test"
   },
   "scripts": {
-    "test": "standard && mocha --require babel-polyfill --compilers js:babel-register"
+    "serve": "webpack-dev-server",
+    "test": "standard && mocha --require babel-polyfill --compilers js:babel-register",
+    "scss": "node-sass --output-style compressed -o dist/css src/ui/scss",
+    "build": "npm test && npm run scss && webpack -p"
   },
   "standard": {
     "globals": [
@@ -36,6 +39,7 @@
     "babel-register": "^6.24.1",
     "chai": "^3.5.0",
     "mocha": "~2.5.3",
+    "node-sass": "^4.5.3",
     "sinon": "^1.17.4",
     "standard": "~7.1.2",
     "webpack": "^2.6.1",

@@ -3,7 +3,7 @@
 // Program includes .data and .text
 // Comments begin with #.  Rest of line is ignored.
 // Identifier names are sequence of letters, numbers, underbars (_) and dots (.).
-// Labels are declared by putting them at beginning of line followed by colon.  Use labels for variables and code locations.
+// Labels are declared at beginning of line followed by colon.  Use labels for variables and code locations.
 // Instruction format: op field followed by one or more operands: addi $t0, $t0, 1
 // Operands may be literal values or registers.
 // Register is hardware primitive, can stored 32-bit value: $s0
