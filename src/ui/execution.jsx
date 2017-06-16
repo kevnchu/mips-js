@@ -35,11 +35,12 @@ export default class ExecutionView extends React.Component {
 
   render () {
     return (
-      <section className="execution-container">
+      <section className='execution-container'>
         <h2>Assembly</h2>
         <textarea value={this.state.programText}
-        onChange={this.handleProgramChange}
-        className={this.state.dirty ? 'input-dirty' : null}></textarea>
+          onChange={this.handleProgramChange}
+          className={this.state.dirty ? 'input-dirty' : null}
+        ></textarea>
         <button onClick={this.loadProgram}>Load</button>
         <button onClick={this.step}>Step</button>
       </section>
